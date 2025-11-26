@@ -258,7 +258,13 @@ const [showCompleteProfile, setShowCompleteProfile] = useState(false);
                     setIsLoggedIn(true);
                     generateMeals(profile.dietForm || dietForm, profile.dietForm?.healthConditions || []);
                 }
-            };
+          // Detectar perfiles incompletos
+                if (savedUser && savedProfile) {
+                    const profile = JSON.parse(savedProfile);
+                    if (!profile.dietForm?.height || !profile.dietForm?.age) {
+                        setShowCompleteProfile(true);
+                    }
+                  };
 
             const handleLogin = () => {
                 setAuthError('');
@@ -338,6 +344,10 @@ const [showCompleteProfile, setShowCompleteProfile] = useState(false);
                 localStorage.setItem('luminaProfile', JSON.stringify(profile));
                 generateMeals(profile.dietForm || dietForm, profile.dietForm?.healthConditions || []);
             };
+                // Detectar perfil incompleto al cambiar
+            if (!profile.dietForm?.height || !profile.dietForm?.age) {
+                setShowCompleteProfile(true);
+            }
 
             const updateProfile = (updates) => {
                 const accounts = getAccounts();
@@ -442,7 +452,34 @@ const [showCompleteProfile, setShowCompleteProfile] = useState(false);
                     {
                         name: },
                     {
-                        name: 'Pechuga de Pollo Grillada con Quinoa'},
+                       {
+    name: 'Carne Molida Magra con Camote',
+    emoji: '🥩',
+    cals: 350,
+    protein: 35,
+    carbs: 30,
+    fat: 10,
+    servings: 1,
+    prep_time: '10 min',
+    cook_time: '20 min',
+    ingredients: [
+        { item: 'Carne molida magra', amount: '150g' },
+        { item: 'Camote', amount: '200g' },
+        { item: 'Cebolla', amount: '1/2' },
+        { item: 'Ajo', amount: '2 dientes' }
+    ],
+    steps: [
+        '1. Corta el camote en cubos',
+        '2. Hornea camote a 200°C por 20 min',
+        '3. Sofríe cebolla y ajo',
+        '4. Agrega carne y cocina 10 min',
+        '5. Sirve junto'
+    ],
+    benefits: 'Proteína magra, carbohidratos complejos',
+    suitable: ['diabetes', 'hypertension']
+},
+{
+     name: 'Pechuga de Pollo Grillada con Quinoa'},
                         emoji: '🍗',
                         cals: 380, protein: 38, carbs: 42, fat: 8,
                         servings: 1, prep_time: '10 min', cook_time: '20 min',
@@ -609,10 +646,152 @@ const [showCompleteProfile, setShowCompleteProfile] = useState(false);
                 setPersonalizedMeals(dailyMeals);
             };
 
-            const saveDietSetup = () => {
-    updateProfile({ dietForm });
-    generateMeals(dietForm, dietForm.healthConditions);
-    setShowDietSetup(false);
+           {showDietSetup && (
+    <div className="p-6 bg-white rounded-xl shadow-md">
+        <div className="space-y-6">
+            {/* PESO */}
+            <div>
+                <label className="text-sm font-semibold text-gray-700 block mb-2">
+                    {t[language].weight}: <span className="text-purple-600">{dietForm.weight}kg</span>
+                </label>
+                <input 
+                    type="range" 
+                    min="45" 
+                    max="150" 
+                    value={dietForm.weight} 
+                    onChange={(e) => setDietForm({ ...dietForm, weight: parseInt(e.target.value) })} 
+                    className="w-full h-2 bg-purple-200 rounded-lg appearance-none cursor-pointer"
+                />
+                <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>45kg</span>
+                    <span>150kg</span>
+                </div>
+            </div>
+
+            {/* ALTURA */}
+            <div>
+                <label className="text-sm font-semibold text-gray-700 block mb-2">
+                    {t[language].height}: <span className="text-purple-600">{dietForm.height}cm</span>
+                </label>
+                <input 
+                    type="range" 
+                    min="140" 
+                    max="200" 
+                    value={dietForm.height} 
+                    onChange={(e) => setDietForm({ ...dietForm, height: parseInt(e.target.value) })} 
+                    className="w-full h-2 bg-purple-200 rounded-lg appearance-none cursor-pointer"
+                />
+                <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>140cm</span>
+                    <span>200cm</span>
+                </div>
+            </div>
+
+            {/* EDAD */}
+            <div>
+                <label className="text-sm font-semibold text-gray-700 block mb-2">
+                    {t[language].age}: <span className="text-purple-600">{dietForm.age} {language === 'es' ? 'años' : 'years'}</span>
+                </label>
+                <input 
+                    type="range" 
+                    min="18" 
+                    max="80" 
+                    value={dietForm.age} 
+                    onChange={(e) => setDietForm({ ...dietForm, age: parseInt(e.target.value) })} 
+                    className="w-full h-2 bg-purple-200 rounded-lg appearance-none cursor-pointer"
+                />
+                <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>18</span>
+                    <span>80</span>
+                </div>
+            </div>
+
+            {/* NIVEL DE ACTIVIDAD */}
+            <div>
+                <label className="text-sm font-semibold text-gray-700 block mb-2">
+                    {t[language].activity}
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                    {['sedentary', 'light', 'moderate', 'active', 'veryActive'].map(level => (
+                        <button
+                            key={level}
+                            onClick={() => setDietForm({ ...dietForm, activityLevel: level })}
+                            className={`p-3 rounded-lg border-2 text-sm font-semibold transition ${
+                                dietForm.activityLevel === level 
+                                    ? 'border-purple-500 bg-purple-50 text-purple-700' 
+                                    : 'border-gray-300 text-gray-600 hover:border-purple-300'
+                            }`}
+                        >
+                            {t[language][level]}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            {/* VISTA PREVIA DE CÁLCULOS */}
+            <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-4 border-2 border-purple-200">
+                <h4 className="text-sm font-semibold text-gray-700 mb-3">
+                    📊 {language === 'es' ? 'Tu Perfil Calculado': 'Your Calculated Profile'}
+                </h4>
+                <div className="grid grid-cols-2 gap-4 text-center">
+                    <div>
+                        <p className="text-xs text-gray-600">{t[language].bmi}</p>
+                        <p className="text-3xl font-bold text-purple-600">
+                            {calculateBMI(dietForm.weight, dietForm.height)}
+                        </p>
+                    </div>
+                    <div>
+                        <p className="text-xs text-gray-600">TDEE</p>
+                        <p className="text-2xl font-bold text-pink-600">
+                            {calculateTDEE(dietForm.weight, dietForm.height, dietForm.age, dietForm.activityLevel)}
+                        </p>
+                        <p className="text-xs text-gray-500">kcal/día</p>
+                    </div>
+                </div>
+            </div>
+
+            {/* CONDICIONES DE SALUD */}
+            <div>
+                <label className="text-sm font-semibold text-gray-700 block mb-2">
+                    {t[language].health_conditions}
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                    {healthConditionsList.map((cond) => (
+                        <label 
+                            key={cond.id} 
+                            className={`flex items-center gap-2 p-2 rounded text-sm cursor-pointer border-2 transition ${
+                                dietForm.healthConditions.includes(cond.id) 
+                                    ? 'border-purple-500 bg-purple-50' 
+                                    : 'border-gray-300 hover:border-purple-300'
+                            }`}
+                        >
+                            <input 
+                                type="checkbox" 
+                                checked={dietForm.healthConditions.includes(cond.id)} 
+                                onChange={(e) => {
+                                    if (e.target.checked) {
+                                        setDietForm({ ...dietForm, healthConditions: [...dietForm.healthConditions, cond.id] });
+                                    } else {
+                                        setDietForm({ ...dietForm, healthConditions: dietForm.healthConditions.filter(c => c !== cond.id) });
+                                    }
+                                }} 
+                            />
+                            <span className="text-gray-700">{cond.name}</span>
+                        </label>
+                    ))}
+                </div>
+            </div>
+        </div>
+        
+        {/* BOTÓN GUARDAR */}
+        <button 
+            onClick={saveDietSetup} 
+            className="w-full mt-6 bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-lg hover:from-purple-700 hover:to-pink-700 font-semibold text-lg shadow-lg"
+        >
+            {t[language].save}
+        </button>
+    </div>
+)}
             };
 // NUEVO: Guardar entrada de síntomas con histórico
 const saveSymptomEntry = () => {
