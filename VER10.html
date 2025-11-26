@@ -7,7 +7,11 @@
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    const [showSymptomLogger
+     <!-- NUEVO: Chart.js para gráficos -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<!-- NUEVO: jsPDF para PDFs -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         * { font-family: 'Lato', sans-serif; }
@@ -24,7 +28,7 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect } = React;
+        const { useState, useEffect, useRef } = React;
 
         // SafeImg: component que maneja imágenes con placeholders SVG
         const SafeImg = ({ src, alt, className }) => {
@@ -176,6 +180,11 @@
                 sleep_issues: 0, joint_pain: 0, brain_fog: 0
             });
             const [showSymptomLogger, setShowSymptomLogger] = useState(false);
+            const [symptomHistory, setSymptomHistory] = useState([]);
+const [showSymptomChart, setShowSymptomChart] = useState(false);
+const chartRef = useRef(null);
+const chartInstanceRef = useRef(null);
+const [showCompleteProfile, setShowCompleteProfile] = useState(false);
 
             // COMMUNITY
             const [showStoryModal, setShowStoryModal] = useState(false);
@@ -431,7 +440,9 @@
                 ],
                 lunch: [
                     {
-                        name: 'Pechuga de Pollo Grillada con Quinoa',
+                        name: },
+                    {
+                        name: 'Pechuga de Pollo Grillada con Quinoa'},
                         emoji: '🍗',
                         cals: 380, protein: 38, carbs: 42, fat: 8,
                         servings: 1, prep_time: '10 min', cook_time: '20 min',
@@ -599,10 +610,26 @@
             };
 
             const saveDietSetup = () => {
-                updateProfile({ dietForm });
-                generateMeals(dietForm, dietForm.healthConditions);
-                setShowDietSetup(false);
+    updateProfile({ dietForm });
+    generateMeals(dietForm, dietForm.healthConditions);
+    setShowDietSetup(false);
             };
+// NUEVO: Guardar entrada de síntomas con histórico
+const saveSymptomEntry = () => {
+    const entry = {
+        date: new Date().toISOString().split('T')[0],
+        values: { ...symptomValues }
+    };
+    const updated = [...symptomHistory, entry];
+    setSymptomHistory(updated);
+    updateProfile({ symptoms: symptomValues, symptomHistory: updated });
+    setShowSymptomLogger(false);
+};
+
+// NUEVO: Generar PDF Médico
+const generateMedicalPDF = () => {
+    // ... todo el código del PDF aquí
+};
 
             // NEW: MONETIZATION & EXPORT FUNCTIONS
             const exportReport = () => {
