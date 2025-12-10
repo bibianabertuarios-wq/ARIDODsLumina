@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUMERA</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: white; color: #3a3530; }
+        body.dark-mode { background: #1a1a1a; color: #e0e0e0; }
+        .screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; padding: 20px; overflow-y: auto; z-index: 10; padding-bottom: 100px; }
+        body.dark-mode .screen { background: #1a1a1a; }
+        .screen { background: white; }
+        .screen.active { display: flex; }
+        .screen-content { max-width: 500px; width: 100%; background: white; border-radius: 20px; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.08); margin-top: 20px; }
+        body.dark-mode .screen-content { background: #2a2a2a; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 500px; margin-bottom: 20px; }
+        .logo-container { display: flex; align-items: center; gap: 10px; }
+        .logo { width: 48px; height: 48px; }
+        .logo-text { font-size: 20px; font-weight: bold; background: linear-gradient(135deg, #9D7AFF 0%, #F3A6C4 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .welcome-header { text-align: center; margin-bottom: 20px; }
+        .welcome-header h2 { font-size: 24px; margin-bottom: 8px; }
+        .welcome-header p { color: #999; font-size: 14px; line-height: 1.8; }
+        input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid rgba(157, 122, 255, 0.2); border-radius: 8px; font-family: inherit; background: #f9f9f9; color: #3a3530; font-size: 15px; }
+        body.dark-mode input, body.dark-mode select, body.dark-mode textarea { background: #3a3a3a; color: #e0e0e0; }
+        label { display: block; font-weight: bold; margin-top: 16px; margin-bottom: 6px; font-size: 15px; }
+        .label-hint { font-weight: normal; color: #999; font-size: 12px; display: block; margin-top: 3px; }
+        .checkbox-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px 0 16px 0; }
+        .checkbox-item { display: flex; align-items: center; padding: 12px; border: 1px solid rgba(157, 122, 255, 0.2); border-radius: 8px; cursor: pointer; background: #f9f9f9; }
+        body.dark-mode .checkbox-item { background: #3a3a3a; }
+        .checkbox-item input { margin-right: 8px; width: 16px; height: 16px; cursor: pointer; }
+        .checkbox-item label { margin: 0; cursor: pointer; font-weight: normal; font-size: 13px; }
+        .legal-checkbox { display: flex; align-items: flex-start; gap: 10px; margin: 16px 0; padding: 12px; background: rgba(157, 122, 255, 0.05); border-radius: 8px; }
+        .legal-checkbox input { margin-top: 4px; width: 18px; height: 18px; flex-shrink: 0; }
+        .legal-checkbox label { margin: 0; font-weight: normal; font-size: 12px; }
+        .info-box { background: rgba(157, 122, 255, 0.05); border-left: 4px solid #F3A6C4; padding: 14px; margin: 14px 0; border-radius: 8px; font-size: 13px; line-height: 1.7; }
+        .info-box strong { color: #9D7AFF; display: block; margin-bottom: 6px; }
+        .gradient-btn { background: linear-gradient(135deg, #9D7AFF 0%, #C49EFF 100%); color: white; border: none; padding: 14px 24px; border-radius: 12px; cursor: pointer; font-weight: bold; width: 100%; font-size: 16px; margin: 12px 0; transition: transform 0.2s; }
+        .gradient-btn:active { transform: scale(0.98); }
+        .navbar { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid rgba(157, 122, 255, 0.2); display: none; justify-content: space-around; padding: 12px 0; z-index: 100; }
+        body.dark-mode .navbar { background: #2a2a2a; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; padding: 8px; font-size: 10px; color: #999; transition: all 0.2s; }
+        .nav-item.active { color: #9D7AFF; font-weight: bold; }
+        .meal-card, .exercise-card, .advice-card, .myth-card, .testimony-card { background: rgba(157, 122, 255, 0.05); border: 1px solid rgba(157, 122, 255, 0.2); border-radius: 12px; padding: 16px; margin: 14px 0; }
+        .meal-title, .exercise-title { font-weight: bold; font-size: 15px; margin-bottom: 8px; }
+        .meal-subtitle { font-size: 13px; color: #9D7AFF; font-weight: 600; margin-bottom: 10px; }
+        .meal-info, .exercise-info { font-size: 12px; line-height: 1.6; color: #666; margin: 8px 0; }
+        body.dark-mode .meal-info, body.dark-mode .exercise-info { color: #aaa; }
+        .collapsible-card { background: #f9f9f9; border: 1px solid rgba(157, 122, 255, 0.2); border-radius: 12px; padding: 16px; margin: 12px 0; cursor: pointer; }
+        body.dark-mode .collapsible-card { background: #3a3a3a; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; }
+        .card-title { font-size: 15px; font-weight: bold; }
+        .collapse-icon { transition: transform 0.3s; }
+        .collapse-icon.open { transform: rotate(180deg); }
+        .collapse-content { display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(157, 122, 255, 0.2); font-size: 13px; line-height: 1.7; }
+        .collapse-content.open { display: block; }
+        .coach-box { background: linear-gradient(135deg, rgba(157, 122, 255, 0.1) 0%, rgba(243, 166, 196, 0.1) 100%); border: 2px solid rgba(157, 122, 255, 0.2); border-radius: 16px; padding: 18px; margin: 20px 0; text-align: center; }
+        .coach-avatar { font-size: 40px; margin-bottom: 12px; }
+        .coach-name { font-weight: bold; color: #9D7AFF; font-size: 14px; margin-bottom: 8px; }
+        .coach-msg { font-size: 14px; color: #666; line-height: 1.8; }
+        body.dark-mode .coach-msg { color: #aaa; }
+        .slider-value { text-align: center; color: #9D7AFF; font-weight: bold; margin-bottom: 12px; font-size: 18px; }
+        .myth-title { font-weight: bold; font-size: 14px; color: #e74c3c; margin-bottom: 8px; }
+        .myth-truth { font-weight: bold; font-size: 14px; color: #27ae60; margin-bottom: 8px; margin-top: 10px; }
+        .myth-text { font-size: 12px; line-height: 1.6; color: #666; }
+        body.dark-mode .myth-text { color: #aaa; }
+        .testimony-author { font-weight: bold; color: #F3A6C4; font-size: 14px; margin-bottom: 8px; }
+        .testimony-text { font-size: 13px; color: #3a3530; line-height: 1.7; font-style: italic; }
+        body.dark-mode .testimony-text { color: #e0e0e0; }
+    </style>
+</head>
+<body>
+
+<!-- REGISTRO -->
+<div id="screen-registro" class="screen active">
+    <div class="top-bar">
+        <div class="logo-container">
+            <div class="logo">🔥</div>
+            <div class="logo-text">LUMERA</div>
+        </div>
+        <button style="background: rgba(157, 122, 255, 0.1); border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 18px;" onclick="toggleDarkMode()">🌙</button>
+    </div>
+    
+    <div class="screen-content">
+        <div class="welcome-header">
+            <h2 id="t-reg-welcome">Hola, bienvenida 💜</h2>
+            <p id="t-reg-intro">Soy LUMERA, tu compañera en este proceso. Aquí no hay prisa, ni juicios. Solo tu historia y nosotras aprendiendo juntas.</p>
+        </div>
+        
+        <div style="display: flex; gap: 10px; margin: 20px 0;">
+            <button class="gradient-btn" onclick="setLanguage('es')" style="margin: 0;">🇪🇸 Español</button>
+            <button class="gradient-btn" onclick="setLanguage('en')" style="margin: 0;">🇬🇧 English</button>
+        </div>
+        
+        <label id="t-label-name">¿Cuál es tu nombre?</label>
+        <input type="text" id="input-name" placeholder="Tu nombre">
+        
+        <label id="t-label-age">¿Cuántos años tienes?</label>
+        <input type="number" id="input-age" min="18" max="70" placeholder="45">
+        
+        <label id="t-label-weight">¿Cuánto pesas? (kg)</label>
+        <input type="number" id="input-weight" step="0.1" placeholder="65">
+        
+        <label id="t-label-height">¿Cuánto mides? (cm)</label>
+        <input type="number" id="input-height" placeholder="165">
+        
+        <label id="t-label-period">¿Dónde estás en tu ciclo?</label>
+        <select id="input-period">
+            <option value="">Selecciona...</option>
+            <option value="regular">Ciclos regulares</option>
+            <option value="irregular">Ciclos irregulares</option>
+            <option value="avanzada">Etapa avanzada</option>
+        </select>
+        
+        <label id="t-label-objective">¿Cuál es tu objetivo?</label>
+        <select id="input-objective">
+            <option value="">Selecciona...</option>
+            <option value="hormonas">Equilibrar mi cuerpo</option>
+            <option value="energia">Recuperar energía</option>
+            <option value="peso">Perder peso</option>
+            <option value="fuerza">Ganar fuerza</option>
+        </select>
+        
+        <label id="t-label-region">¿De qué región eres?</label>
+        <select id="input-region">
+            <option value="">Selecciona...</option>
+            <option value="espana">🇪🇸 España</option>
+            <option value="emea">🌍 EMEA</option>
+            <option value="latam">🌎 Latinoamérica</option>
+            <option value="usa">🇺🇸 USA</option>
+        </select>
+        
+        <label>¿Tienes alguna condición de salud?</label>
+        <div class="checkbox-group">
+            <div class="checkbox-item">
+                <input type="checkbox" id="diabetes" name="health" value="diabetes">
+                <label for="diabetes">Diabetes</label>
+            </div>
+            <div class="checkbox-item">
+                <input type="checkbox" id="hypertension" name="health" value="hipertension">
+                <label for="hypertension">Hipertensión</label>
+            </div>
+            <div class="checkbox-item">
+                <input type="checkbox" id="thyroid" name="health" value="tiroides">
+                <label for="thyroid">Tiroides</label>
+            </div>
+            <div class="checkbox-item">
+                <input type="checkbox" id="none-health" name="health" value="ninguna">
+                <label for="none-health">Ninguna</label>
+            </div>
+        </div>
+        
+        <label>¿Tienes restricciones alimentarias?</label>
+        <div class="checkbox-group">
+            <div class="checkbox-item">
+                <input type="checkbox" id="veg" name="restriction" value="vegetariana">
+                <label for="veg">Vegetariana</label>
+            </div>
+            <div class="checkbox-item">
+                <input type="checkbox" id="vegan" name="restriction" value="vegana">
+                <label for="vegan">Vegana</label>
+            </div>
+            <div class="checkbox-item">
+                <input type="checkbox" id="gf" name="restriction" value="gluten">
+                <label for="gf">Sin gluten</label>
+            </div>
+            <div class="checkbox-item">
+                <input type="checkbox" id="lactose" name="restriction" value="lactosa">
+                <label for="lactose">Sin lactosa</label>
+            </div>
+        </div>
+        
+        <div class="legal-checkbox">
+            <input type="checkbox" id="agree-legal">
+            <label for="agree-legal" id="t-agree-label">Soy mayor de 18 años y entiendo que LUMERA no reemplaza a mi médico.</label>
+        </div>
+        
+        <button class="gradient-btn" onclick="saveRegistration()" id="t-btn-register">Empecemos juntas 💜</button>
+    </div>
+</div>
+
+<!-- HOME / SÍNTOMAS -->
+<div id="screen-home" class="screen">
+    <div class="top-bar">
+        <div class="logo-container">
+            <div class="logo">🔥</div>
+            <div class="logo-text">LUMERA</div>
+        </div>
+        <button style="background: rgba(157, 122, 255, 0.1); border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer;" onclick="toggleDarkMode()">🌙</button>
+    </div>
+    
+    <div class="screen-content">
+        <h2 style="text-align: center; font-size: 20px; margin-bottom: 8px;" id="t-home-title">¿Cómo te sientes hoy?</h2>
+        <p style="text-align: center; color: #999; font-size: 13px; margin-bottom: 20px;">No hay respuestas correctas. Solo la tuya.</p>
+        
+        <label>⚡ Energía</label>
+        <input type="range" id="energy" min="1" max="10" value="5" oninput="updateSliderValue('energy'); updateCoach()">
+        <div class="slider-value"><span id="energy-val">5</span>/10</div>
+        
+        <label>😴 Sueño</label>
+        <input type="range" id="sleep" min="1" max="10" value="5" oninput="updateSliderValue('sleep'); updateCoach()">
+        <div class="slider-value"><span id="sleep-val">5</span>/10</div>
+        
+        <label>❤️ Ánimo</label>
+        <input type="range" id="mood" min="1" max="10" value="5" oninput="updateSliderValue('mood'); updateCoach()">
+        <div class="slider-value"><span id="mood-val">5</span>/10</div>
+        
+        <label>🌡️ Sofocos</label>
+        <input type="range" id="flashes" min="0" max="10" value="0" oninput="updateSliderValue('flashes'); updateCoach()">
+        <div class="slider-value"><span id="flashes-val">0</span>/10</div>
+        
+        <label>Si quieres, cuéntame algo más</label>
+        <textarea id="notes" style="min-height: 60px; width: 100%; padding: 12px; border: 1px solid rgba(157, 122, 255, 0.2); border-radius: 8px;"></textarea>
+        
+        <div class="coach-box">
+            <div class="coach-avatar">🔥</div>
+            <div class="coach-name" id="t-coach-name">LUMERA te escucha</div>
+            <div class="coach-msg" id="coach-msg-text">Cuéntame cómo te sientes hoy. Cada día es único y tu cuerpo tiene mucho que decir.</div>
+        </div>
+        
+        <button class="gradient-btn" onclick="saveDailySymptoms(); goToScreen('menu')" id="t-btn-save">Ver menú personalizado 💜</button>
+    </div>
+</div>
+
+<!-- MENU -->
+<div id="screen-menu" class="screen">
+    <div class="top-bar">
+        <div class="logo-container">
+            <div class="logo">🔥</div>
+            <div class="logo-text">LUMERA</div>
+        </div>
+        <button style="background: rgba(157, 122, 255, 0.1); border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer;" onclick="toggleDarkMode()">🌙</button>
+    </div>
+    
+    <div class="screen-content">
+        <h2 style="text-align: center; font-size: 20px; margin-bottom: 8px;">Tu menú de hoy</h2>
+        <p style="text-align: center; color: #999; font-size: 13px; margin-bottom: 18px;">Pensado para ti. Para cómo te sientes.</p>
+        <div id="menu-container"></div>
+    </div>
+</div>
+
+<!-- EJERCICIOS -->
+<div id="screen-exercises" class="screen">
+    <div class="top-bar">
+        <div class="logo-container">
+            <div class="logo">🔥</div>
+            <div class="logo-text">LUMERA</div>
+        </div>
+        <button style="background: rgba(157, 122, 255, 0.1); border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer;" onclick="toggleDarkMode()">🌙</button>
+    </div>
+    
+    <div class="screen-content">
+        <h2 style="text-align: center; font-size: 20px;">Tu rutina</h2>
+        <p style="text-align: center; color: #999; font-size: 13px; margin-bottom: 18px;">Adaptada a cómo te sientes hoy.</p>
+        <div id="exercises-container"></div>
+    </div>
+</div>
+
+<!-- CONSEJOS -->
+<div id="screen-advice" class="screen">
+    <div class="top-bar">
+        <div class="logo-container">
+            <div class="logo">🔥</div>
+            <div class="logo-text">LUMERA</div>
+        </div>
+        <button style="background: rgba(157, 122, 255, 0.1); border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer;" onclick="toggleDarkMode()">🌙</button>
+    </div>
+    
+    <div class="screen-content">
+        <h2 style="text-align: center; font-size: 20px;">Cosas que te van a ayudar</h2>
+        <p style="text-align: center; color: #999; font-size: 13px; margin-bottom: 18px;">Pequeños cambios, grandes diferencias.</p>
+        <div id="advice-container"></div>
+    </div>
+</div>
+
+<!-- MITOS -->
+<div id="screen-myths" class="screen">
+    <div class="top-bar">
+        <div class="logo-container">
+            <div class="logo">🔥</div>
+            <div class="logo-text">LUMERA</div>
+        </div>
+        <button style="background: rgba(157, 122, 255, 0.1); border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer;" onclick="toggleDarkMode()">🌙</button>
+    </div>
+    
+    <div class="screen-content">
+        <h2 style="text-align: center; font-size: 20px;">Lo que NO es verdad</h2>
+        <p style="text-align: center; color: #999; font-size: 13px; margin-bottom: 18px;">Y la ciencia que lo demuestra.</p>
+        <div id="myths-container"></div>
+    </div>
+</div>
+
+<!-- TRIBU -->
+<div id="screen-tribu" class="screen">
+    <div class="top-bar">
+        <div class="logo-container">
+            <div class="logo">🔥</div>
+            <div class="logo-text">LUMERA</div>
+        </div>
+        <button style="background: rgba(157, 122, 255, 0.1); border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer;" onclick="toggleDarkMode()">🌙</button>
+    </div>
+    
+    <div class="screen-content">
+        <h2 style="text-align: center; font-size: 20px;">La Tribu</h2>
+        <p style="text-align: center; color: #999; font-size: 13px; margin-bottom: 18px;">Historias de mujeres como tú.</p>
+        <div id="tribu-container"></div>
+    </div>
+</div>
+
+<!-- NAVBAR -->
+<div class="navbar" id="navbar">
+    <div class="nav-item active" onclick="goToScreen('home')"><span>📊</span><span>Síntomas</span></div>
+    <div class="nav-item" onclick="goToScreen('menu')"><span>🥗</span><span>Menú</span></div>
+    <div class="nav-item" onclick="goToScreen('exercises')"><span>💪</span><span>Rutina</span></div>
+    <div class="nav-item" onclick="goToScreen('advice')"><span>💜</span><span>Consejos</span></div>
+    <div class="nav-item" onclick="goToScreen('myths')"><span>🧠</span><span>Mitos</span></div>
+    <div class="nav-item" onclick="goToScreen('tribu')"><span>👯</span><span>Tribu</span></div>
+    <div class="nav-item" onclick="logout()"><span>🚪</span><span>Salir</span></div>
+</div>
+
+<script>
+    let lang = localStorage.getItem('lumera_lang') || 'es';
+    let user = JSON.parse(localStorage.getItem('lumera_user')) || null;
+    let darkMode = localStorage.getItem('lumera_darkmode') === 'true';
+    
+    if (darkMode) document.body.classList.add('dark-mode');
+
+    const translations = {
+        es: {
+            't-reg-welcome': 'Hola, bienvenida 💜',
+            't-reg-intro': 'Soy LUMERA, tu compañera en este proceso. Aquí no hay prisa, ni juicios. Solo tu historia y nosotras aprendiendo juntas.',
+            't-label-name': '¿Cuál es tu nombre?',
+            't-label-age': '¿Cuántos años tienes?',
+            't-label-weight': '¿Cuánto pesas? (kg)',
+            't-label-height': '¿Cuánto mides? (cm)',
+            't-label-period': '¿Dónde estás en tu ciclo?',
+            't-label-objective': '¿Cuál es tu objetivo?',
+            't-label-region': '¿De qué región eres?',
+            't-agree-label': 'Soy mayor de 18 años y entiendo que LUMERA no reemplaza a mi médico.',
+            't-btn-register': 'Empecemos juntas 💜',
+            't-home-title': '¿Cómo te sientes hoy?',
+            't-btn-save': 'Ver menú personalizado 💜',
+        },
+        en: {
+            't-reg-welcome': 'Hi, welcome 💜',
+            't-reg-intro': 'I\'m LUMERA, your companion. Here there\'s no rush, no judgment. Just your story and us learning together.',
+            't-label-name': 'What is your name?',
+            't-label-age': 'How old are you?',
+            't-label-weight': 'How much do you weigh? (kg)',
+            't-label-height': 'How tall are you? (cm)',
+            't-label-period': 'Where are you in your cycle?',
+            't-label-objective': 'What is your goal?',
+            't-label-region': 'What region are you from?',
+            't-agree-label': 'I am over 18 and understand LUMERA does not replace my doctor.',
+            't-btn-register': 'Let\'s get started 💜',
+            't-home-title': 'How are you feeling today?',
+            't-btn-save': 'See personalized menu 💜',
+        }
+    };
+
+    const meals = {
+        es: [
+            { emoji: '🥣', name: 'Avena con Frutos Rojos', macros: '45% carbos, 18% proteína, 37% grasa', micros: 'Hierro, Magnesio, B6', why: 'La avena estabiliza tu glucosa. Los frutos rojos son antiinflamatorios. Te dan energía constante.', how: 'Cocina 50g avena con leche. Añade arándanos, nueces y miel. Listo.' },
+            { emoji: '🥗', name: 'Pollo con Quinoa', macros: '42% carbos, 35% proteína, 23% grasa', micros: 'Zinc, Selenio, Vitamina E', why: 'La proteína mantiene tu masa muscular. La quinoa tiene todos los aminoácidos.', how: '150g pollo. 100g quinoa. Espárragos, tomates cherry al horno. Limón y oliva.' },
+            { emoji: '🍽️', name: 'Salmón con Batata', macros: '38% carbos, 32% proteína, 30% grasa', micros: 'Omega-3, Vitamina D, Selenio', why: 'El omega-3 reduce inflamación. La batata te ayuda a dormir mejor.', how: 'Papel aluminio. 150g salmón, batata, champiñones. Sal, pimienta, limón. Hornea 25 min.' },
+        ],
+        en: [
+            { emoji: '🥣', name: 'Oatmeal with Berries', macros: '45% carbs, 18% protein, 37% fat', micros: 'Iron, Magnesium, B6', why: 'Oats stabilize your blood sugar. Berries are anti-inflammatory. Constant energy.', how: 'Cook 50g oats with milk. Add blueberries, walnuts and honey. Done.' },
+            { emoji: '🥗', name: 'Chicken with Quinoa', macros: '42% carbs, 35% protein, 23% fat', micros: 'Zinc, Selenium, Vitamin E', why: 'Protein maintains muscle. Quinoa has all amino acids.', how: '150g chicken. 100g quinoa. Asparagus, tomatoes in oven. Lemon and olive oil.' },
+            { emoji: '🍽️', name: 'Salmon with Sweet Potato', macros: '38% carbs, 32% protein, 30% fat', micros: 'Omega-3, Vitamin D, Selenium', why: 'Omega-3 reduces inflammation. Sweet potato helps you sleep.', how: 'Aluminum foil. 150g salmon, sweet potato, mushrooms. Salt, pepper, lemon. Bake 25 min.' },
+        ]
+    };
+
+    const exercises = {
+        es: [
+            { emoji: '🧘‍♀️', name: 'Yoga restaurativo', duration: '20-30 min', why: 'Reduce estrés. Perfecto para baja energía.' },
+            { emoji: '🚴‍♀️', name: 'Ciclismo suave', duration: '30-40 min', why: 'Mejora circulación. Fortalece piernas.' },
+            { emoji: '💪', name: 'Peso corporal', duration: '20-25 min', why: 'Mantén tu fuerza de forma segura.' },
+            { emoji: '🏃‍♀️', name: 'Caminata consciente', duration: '30 min', why: 'Movimiento suave y conexión con tu cuerpo.' },
+        ],
+        en: [
+            { emoji: '🧘‍♀️', name: 'Restorative yoga', duration: '20-30 min', why: 'Reduces stress. Perfect for low energy.' },
+            { emoji: '🚴‍♀️', name: 'Easy cycling', duration: '30-40 min', why: 'Improves circulation. Strengthens legs.' },
+            { emoji: '💪', name: 'Bodyweight', duration: '20-25 min', why: 'Maintain your strength safely.' },
+            { emoji: '🏃‍♀️', name: 'Mindful walking', duration: '30 min', why: 'Gentle movement and body connection.' },
+        ]
+    };
+
+    const advice = {
+        es: ['💧 Bebe 2-3 litros diarios. Hidratación = equilibrio hormonal.', '🌙 Duerme 7-8 horas. Tu cuerpo se repara en la noche.', '🧂 Reduce sodio procesado. Aumenta sofocos.', '☕ Limita cafeína.', '🫂 Conecta con otras mujeres.', '🧘 Respira profundo 5 min diarios.'],
+        en: ['💧 Drink 2-3 liters daily. Hydration = hormonal balance.', '🌙 Sleep 7-8 hours. Your body repairs itself.', '🧂 Reduce processed sodium. Increases hot flashes.', '☕ Limit caffeine.', '🫂 Connect with other women.', '🧘 Deep breathing 5 min daily.']
+    };
+
+    const myths = {
+        es: [
+            { myth: 'El café es enemigo durante cambios hormonales', truth: 'Una taza al día es segura y puede mejorar memoria y energía.', science: 'Estudio Journal of Women\'s Health (2022): hasta 200mg de cafeína diaria es seguro.' },
+            { myth: 'Los carbohidratos te engordan inevitablemente', truth: 'Los carbohidratos complejos son esenciales para energía y estabilidad hormonal.', science: 'NIH - Institute of Diabetes: carbohidratos integrales mejoran insulina en un 15%.' },
+            { myth: 'Tienes que hacer ejercicio intenso para ver resultados', truth: 'El movimiento suave consistente es más efectivo y sostenible que el intenso.', science: 'Estudio British Journal of Sports Medicine (2023): 30 min diarios de actividad moderada reduce síntomas hasta 60%.' },
+            { myth: 'Los suplementos naturales son siempre seguros', truth: 'Solo algunos tienen evidencia científica. Consulta a tu médico.', science: 'FDA y European Medicines Agency: solo el magnesio y vitamina D tienen estudios sólidos.' },
+        ],
+        en: [
+            { myth: 'Coffee is an enemy during hormonal changes', truth: 'One cup a day is safe and can improve memory and energy.', science: 'Journal of Women\'s Health (2022): up to 200mg caffeine daily is safe.' },
+            { myth: 'Carbohydrates inevitably make you fat', truth: 'Complex carbohydrates are essential for energy and hormonal stability.', science: 'NIH - Institute of Diabetes: whole grain carbs improve insulin by 15%.' },
+            { myth: 'You have to do intense exercise to see results', truth: 'Gentle consistent movement is more effective and sustainable than intense.', science: 'British Journal of Sports Medicine (2023): 30 min daily moderate activity reduces symptoms by 60%.' },
+            { myth: 'Natural supplements are always safe', truth: 'Only some have scientific evidence. Consult your doctor.', science: 'FDA and European Medicines Agency: only magnesium and vitamin D have solid studies.' },
+        ]
+    };
+
+    const testimonies = {
+        es: [
+            { name: 'María, 48', text: 'Dejé de esperar a que alguien me arreglara. Ahora sé exactamente qué necesita mi cuerpo. Y lo que necesita es ESCUCHA, no soluciones rápidas.' },
+            { name: 'Carmen, 52', text: 'Este cuerpo me ha dado 52 años de vida. Merece que lo honre. Merece nutrición inteligente, movimiento que respete mis límites, y descanso sin culpa.' },
+            { name: 'Rosa, 50', text: 'Mi mayor poder fue dejar de luchar contra lo que me pasa y empezar a entenderlo. Lumera me enseñó a hablar el mismo idioma que mi cuerpo.' },
+        ],
+        en: [
+            { name: 'Maria, 48', text: 'I stopped waiting for someone to fix me. Now I know exactly what my body needs. It needs LISTENING, not quick fixes.' },
+            { name: 'Carmen, 52', text: 'This body gave me 52 years of life. It deserves honor. It deserves intelligent nutrition, movement that respects my limits, and guilt-free rest.' },
+            { name: 'Rosa, 50', text: 'My greatest power was stopping fighting what happens and starting to understand it. Lumera taught me to speak my body\'s language.' },
+        ]
+    };
+
+    function setLanguage(l) {
+        lang = l;
+        localStorage.setItem('lumera_lang', lang);
+        updateAllTexts();
+        loadContent();
+    }
+
+    function updateAllTexts() {
+        const t = translations[lang];
+        for (let key in t) {
+            const el = document.getElementById(key);
+            if (el) el.textContent = t[key];
+        }
+    }
+
+    function loadContent() {
+        loadMenu();
+        loadExercises();
+        loadAdvice();
+        loadMyths();
+        loadTribu();
+    }
+
+    function loadMenu() {
+        const container = document.getElementById('menu-container');
+        const daily = JSON.parse(localStorage.getItem('lumera_daily')) || { energy: 5, sleep: 5, flashes: 0 };
+        const restrictions = user?.restrictions || [];
+        
+        let mealsList = meals[lang];
+        
+        // Filtrar según restricciones
+        mealsList = mealsList.filter(meal => {
+            if (restrictions.includes('vegetariana') && meal.emoji === '🍽️') return false; // Sin salmón
+            if (restrictions.includes('vegana')) return meal.emoji === '🥣'; // Solo avena
+            if (restrictions.includes('gluten')) return meal.emoji !== '🍞'; // Sin gluten
+            if (restrictions.includes('lactosa') && meal.emoji === '🥣') return false; // Sin leche
+            return true;
+        });
+        
+        // Reordenar según energía
+        if (daily.energy < 5) {
+            // Bajo: mostrar opción más ligera primero
+            mealsList = mealsList.sort((a, b) => {
+                const order = ['🥣', '🥗', '🍽️'];
+                return order.indexOf(a.emoji) - order.indexOf(b.emoji);
+            });
+        } else if (daily.energy > 8) {
+            // Alto: mostrar opciones más sustanciosas
+            mealsList = mealsList.sort((a, b) => {
+                const order = ['🍽️', '🥗', '🥣'];
+                return order.indexOf(a.emoji) - order.indexOf(b.emoji);
+            });
+        }
+        
+        container.innerHTML = mealsList.map(meal => `
+            <div class="meal-card">
+                <div class="meal-title">${meal.emoji} ${meal.name}</div>
+                <div class="meal-subtitle">${lang === 'es' ? 'Macronutrientes' : 'Macronutrients'}: ${meal.macros}</div>
+                <div class="meal-info"><strong>${lang === 'es' ? 'Micronutrientes' : 'Micronutrients'}:</strong> ${meal.micros}</div>
+                <div class="collapsible-card" onclick="toggleCollapse(this)">
+                    <div class="card-header">
+                        <span class="card-title">${lang === 'es' ? '¿Por qué?' : 'Why?'}</span>
+                        <span class="collapse-icon">▼</span>
+                    </div>
+                    <div class="collapse-content">${meal.why}</div>
+                </div>
+                <div class="collapsible-card" onclick="toggleCollapse(this)">
+                    <div class="card-header">
+                        <span class="card-title">${lang === 'es' ? '¿Cómo lo preparo?' : 'How to prepare?'}</span>
+                        <span class="collapse-icon">▼</span>
+                    </div>
+                    <div class="collapse-content">${meal.how}</div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function loadExercises() {
+        const container = document.getElementById('exercises-container');
+        const exercisesList = exercises[lang];
+        container.innerHTML = exercisesList.map(ex => `
+            <div class="exercise-card">
+                <div class="exercise-title">${ex.emoji} ${ex.name}</div>
+                <div class="exercise-info"><strong>${lang === 'es' ? 'Duración' : 'Duration'}:</strong> ${ex.duration}</div>
+                <div class="exercise-info"><strong>${lang === 'es' ? '¿Por qué?' : 'Why?'}</strong> ${ex.why}</div>
+            </div>
+        `).join('');
+    }
+
+    function loadAdvice() {
+        const container = document.getElementById('advice-container');
+        const adviceList = advice[lang];
+        container.innerHTML = adviceList.map(adv => `<div class="advice-card">${adv}</div>`).join('');
+    }
+
+    function loadMyths() {
+        const container = document.getElementById('myths-container');
+        const mythsList = myths[lang];
+        container.innerHTML = mythsList.map(m => `
+            <div class="myth-card">
+                <div class="myth-title">❌ ${m.myth}</div>
+                <div class="myth-truth">✅ ${m.truth}</div>
+                <div class="myth-text" style="background: rgba(157, 122, 255, 0.08); padding: 10px; border-radius: 6px; margin-top: 12px; border-left: 3px solid #9D7AFF;">
+                    <strong style="color: #9D7AFF; display: block; margin-bottom: 6px;">${lang === 'es' ? '📚 Fuente:' : '📚 Source:'}</strong> 
+                    ${m.science}
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function loadTribu() {
+        const container = document.getElementById('tribu-container');
+        const testList = testimonies[lang];
+        container.innerHTML = testList.map(t => `
+            <div class="testimony-card">
+                <div class="testimony-author">— ${t.name}</div>
+                <div class="testimony-text">"${t.text}"</div>
+            </div>
+        `).join('');
+    }
+
+    function toggleCollapse(el) {
+        const content = el.querySelector('.collapse-content');
+        const icon = el.querySelector('.collapse-icon');
+        content.classList.toggle('open');
+        icon.classList.toggle('open');
+    }
+
+    function toggleDarkMode() {
+        darkMode = !darkMode;
+        localStorage.setItem('lumera_darkmode', darkMode);
+        document.body.classList.toggle('dark-mode');
+    }
+
+    function updateSliderValue(id) {
+        document.getElementById(id + '-val').textContent = document.getElementById(id).value;
+    }
+
+    function saveRegistration() {
+        const name = document.getElementById('input-name').value;
+        const age = document.getElementById('input-age').value;
+        const region = document.getElementById('input-region').value;
+        const health = Array.from(document.querySelectorAll('input[name="health"]:checked')).map(el => el.value);
+        const restrictions = Array.from(document.querySelectorAll('input[name="restriction"]:checked')).map(el => el.value);
+        
+        if (!name || !age || !region || !document.getElementById('agree-legal').checked) {
+            alert(lang === 'es' ? 'Completa todos los campos' : 'Fill all fields');
+            return;
+        }
+        
+        user = { name, age, region, health, restrictions, registered: true };
+        localStorage.setItem('lumera_user', JSON.stringify(user));
+        document.getElementById('screen-registro').classList.remove('active');
+        document.getElementById('screen-home').classList.add('active');
+        document.getElementById('navbar').style.display = 'flex';
+    }
+
+    function saveDailySymptoms() {
+        const today = new Date().toISOString().split('T')[0];
+        const symptoms = {
+            date: today,
+            energy: parseInt(document.getElementById('energy').value),
+            sleep: parseInt(document.getElementById('sleep').value),
+            mood: parseInt(document.getElementById('mood').value),
+            flashes: parseInt(document.getElementById('flashes').value),
+            notes: document.getElementById('notes').value
+        };
+        localStorage.setItem('lumera_daily', JSON.stringify(symptoms));
+    }
+
+    function updateCoach() {
+        const energy = parseInt(document.getElementById('energy').value);
+        const sleep = parseInt(document.getElementById('sleep').value);
+        const mood = parseInt(document.getElementById('mood').value);
+        const flashes = parseInt(document.getElementById('flashes').value);
+        
+        let message = lang === 'es' 
+            ? 'Estás en balance. Tu cuerpo está en armonía contigo.' 
+            : 'You\'re in balance. Your body is in harmony with you.';
+        
+        if (energy < 4) {
+            message = lang === 'es' 
+                ? 'Tu energía está baja hoy. Necesitas movimiento suave pero constante. ¿Una caminata o yoga?' 
+                : 'Your energy is low today. You need gentle but consistent movement. A walk or yoga?';
+        } else if (energy > 8) {
+            message = lang === 'es' 
+                ? '¡Radiante! Tu energía está por las nubes. Hoy puedes hacer lo que te hace sentir fuerte.' 
+                : 'Radiant! Your energy is through the roof. Today you can do what makes you feel strong.';
+        }
+        
+        if (sleep < 4) {
+            message = lang === 'es' 
+                ? 'Poco descanso. Tu cuerpo necesita: hidratación extra, movimiento suave y magnesio en la noche.' 
+                : 'Little sleep. Your body needs: extra hydration, gentle movement, and magnesium at night.';
+        }
+        
+        if (flashes > 6) {
+            message = lang === 'es' 
+                ? 'Muchos sofocos. Aumenta agua, reduce cafeína, y prueba técnicas de respiración.' 
+                : 'Many hot flashes. Increase water, reduce caffeine, and try breathing techniques.';
+        }
+        
+        document.getElementById('coach-msg-text').textContent = message;
+    }
+
+    function goToScreen(screen) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('screen-' + screen).classList.add('active');
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        event.target.closest('.nav-item').classList.add('active');
+    }
+
+    function logout() {
+        localStorage.removeItem('lumera_user');
+        user = null;
+        document.getElementById('screen-home').classList.remove('active');
+        document.getElementById('screen-registro').classList.add('active');
+        document.getElementById('navbar').style.display = 'none';
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        updateAllTexts();
+        loadContent();
+        if (user) {
+            document.getElementById('screen-registro').classList.remove('active');
+            document.getElementById('screen-home').classList.add('active');
+            document.getElementById('navbar').style.display = 'flex';
+        }
+    });
+</script>
+
+</body>
+</html>
