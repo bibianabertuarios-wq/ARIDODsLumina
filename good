@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lumera - Your Wellness Companion</title>
+    <title>Lumina - Your Wellness Companion</title>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -11,11 +11,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
-        * { font-family: 'Nunito', sans-serif; }
+        * { font-family: 'Lato', sans-serif; }
         h1, h2, h3 { font-family: 'Playfair Display', serif; }
-        .gradient-text { background: linear-gradient(135deg, #b8a8d8 0%, #d4af7f 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .gradient-text { background: linear-gradient(135deg, #9333ea 0%, #ec4899 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     </style>
 </head>
 <body>
@@ -24,7 +24,7 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
-        const LumeraApp = () => {
+        const LuminaApp = () => {
             const [language, setLanguage] = useState('es');
             const [darkMode, setDarkMode] = useState(false);
             const [currentUser, setCurrentUser] = useState(null);
@@ -42,12 +42,6 @@
                 height: '',
                 weight: '',
                 conditions: [],
-            });
-
-            const [legalAgreements, setLegalAgreements] = useState({
-                over18: false,
-                notReplaceDoctor: false,
-                privacy: false
             });
 
             const [symptomForm, setSymptomForm] = useState({
@@ -85,7 +79,7 @@
 
             const t = {
                 es: {
-                    app_name: 'Lumera',
+                    app_name: 'Lumina',
                     home: 'Inicio',
                     nutrition: 'Nutrición',
                     exercise: 'Ejercicio',
@@ -116,7 +110,7 @@
                     hormonal: 'Equilibrio Hormonal'
                 },
                 en: {
-                    app_name: 'Lumera',
+                    app_name: 'Lumina',
                     home: 'Home',
                     nutrition: 'Nutrition',
                     exercise: 'Exercise',
@@ -150,12 +144,12 @@
 
             // CARGAR DATOS
             useEffect(() => {
-                const saved = localStorage.getItem('lumeraUser');
-                const savedDark = localStorage.getItem('lumeraDark');
-                const savedLang = localStorage.getItem('lumeraLang');
-                const savedSymptoms = localStorage.getItem('lumeraSymptoms');
-                const savedPeriod = localStorage.getItem('lumeraPeriod');
-                const savedMessages = localStorage.getItem('lumeraMessages');
+                const saved = localStorage.getItem('luminaUser');
+                const savedDark = localStorage.getItem('luminaDark');
+                const savedLang = localStorage.getItem('luminaLang');
+                const savedSymptoms = localStorage.getItem('luminaSymptoms');
+                const savedPeriod = localStorage.getItem('luminaPeriod');
+                const savedMessages = localStorage.getItem('luminaMessages');
                 
                 if (saved) {
                     setCurrentUser(JSON.parse(saved));
@@ -173,11 +167,11 @@
 
             // GUARDAR DATOS
             useEffect(() => {
-                localStorage.setItem('lumeraDark', JSON.stringify(darkMode));
-                localStorage.setItem('lumeraLang', language);
-                localStorage.setItem('lumeraSymptoms', JSON.stringify(symptoms));
-                localStorage.setItem('lumeraPeriod', JSON.stringify(periodLog));
-                localStorage.setItem('lumeraMessages', JSON.stringify(userMessages));
+                localStorage.setItem('luminaDark', JSON.stringify(darkMode));
+                localStorage.setItem('luminaLang', language);
+                localStorage.setItem('luminaSymptoms', JSON.stringify(symptoms));
+                localStorage.setItem('luminaPeriod', JSON.stringify(periodLog));
+                localStorage.setItem('luminaMessages', JSON.stringify(userMessages));
             }, [darkMode, language, symptoms, periodLog, userMessages]);
 
             // GRÁFICOS DE SÍNTOMAS
@@ -440,7 +434,7 @@
             const renderQuiz = () => {
                 if (quizStep === 1) {
                     return (
-                        <div className={`min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-purple-100 to-yellow-50'} flex items-center justify-center p-4`}>
+                        <div className={`min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-purple-100 to-pink-100'} flex items-center justify-center p-4`}>
                             <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-2xl p-12 max-w-3xl w-full space-y-8`}>
                                 <div className="flex justify-end mb-4">
                                     <select value={language} onChange={(e) => setLanguage(e.target.value)} className={`px-4 py-2 rounded-lg border font-semibold ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-100 border-gray-300'}`}>
@@ -450,21 +444,7 @@
                                 </div>
 
                                 <div className="text-center">
-                                    <div className="flex justify-center mb-4">
-                                        <svg width="80" height="80" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-                                            <defs>
-                                                <linearGradient id="flameGradWelcome" x1="0%" y1="0%" x2="0%" y2="100%">
-                                                    <stop offset="0%" style={{stopColor:'#d4af7f',stopOpacity:1}} />
-                                                    <stop offset="100%" style={{stopColor:'#e8c89f',stopOpacity:1}} />
-                                                </linearGradient>
-                                            </defs>
-                                            {/* Media Luna */}
-                                            <path d="M 32 12 A 20 20 0 0 0 32 52 A 16 16 0 0 1 32 16 Z" fill="#b8a8d8"/>
-                                            {/* Llama minimalista */}
-                                            <path d="M 40 32 Q 40 26 42 22 Q 42 28 40 35 Q 38 28 38 22 Q 40 26 40 32" fill="url(#flameGradWelcome)"/>
-                                        </svg>
-                                    </div>
-                                    <h1 className="text-5xl font-light gradient-text mb-4">Lumera</h1>
+                                    <h1 className="text-5xl font-light gradient-text mb-4">✨ Lumina</h1>
                                     <p className="text-2xl font-light text-gray-700 dark:text-gray-300 mb-6">{language === 'es' ? 'Tu Compañera Personalizada' : 'Your Personalized Companion'}</p>
                                     <p className="text-lg text-gray-600 dark:text-gray-400 leading-relaxed mb-8">
                                         {language === 'es' 
@@ -473,19 +453,19 @@
                                     </p>
                                 </div>
 
-                                <div className={`${darkMode ? 'bg-gray-700' : 'bg-purple-100'} rounded-xl p-8 space-y-4 border-l-4 border-purple-300`}>
-                                    <h3 className="font-bold text-lg">{language === 'es' ? '✨ Qué Encontrarás en Lumera' : '✨ What You\'ll Find in Lumera'}</h3>
+                                <div className={`${darkMode ? 'bg-gray-700' : 'bg-purple-50'} rounded-xl p-8 space-y-4 border-l-4 border-purple-600`}>
+                                    <h3 className="font-bold text-lg">{language === 'es' ? '✨ ¿Qué Hace Especial a Lumina?' : '✨ What Makes Lumina Special?'}</h3>
                                     <div className="space-y-3 text-sm">
-                                        <p>🥗 {language === 'es' ? 'Menús 7 días personalizados (4 comidas/día) - Tu nutrición única' : 'Personalized 7-day menus (4 meals/day) - Your unique nutrition'}</p>
-                                        <p>💪 {language === 'es' ? 'Ejercicios según TU objetivo (Fuerza, Peso, Hormonal) con rutina semanal' : 'Exercises for YOUR goal (Strength, Weight, Hormonal) with weekly routine'}</p>
-                                        <p>📊 {language === 'es' ? 'Registro de síntomas diarios - Sueño, Energía, Ánimo, Sofocos' : 'Daily symptom tracking - Sleep, Energy, Mood, Hot Flashes'}</p>
-                                        <p>📅 {language === 'es' ? 'Seguimiento de ciclos - Entiende los patrones de tu período' : 'Cycle tracking - Understand your menstrual patterns'}</p>
-                                        <p>💜 {language === 'es' ? 'Coach permanente individual - No estás sola' : 'Personal permanent coach - You\'re not alone'}</p>
-                                        <p>🧠 {language === 'es' ? 'Información con ciencia real - Mitos desmentidos con números' : 'Science-backed information - Myths debunked with real data'}</p>
+                                        <p>✅ {language === 'es' ? 'Menús 7 días personalizados (4 comidas/día) - Tu nutrición única' : 'Personalized 7-day menus (4 meals/day) - Your unique nutrition'}</p>
+                                        <p>✅ {language === 'es' ? 'Ejercicios según TU objetivo (Fuerza, Peso, Hormonal) con rutina semanal' : 'Exercises for YOUR goal (Strength, Weight, Hormonal) with weekly routine'}</p>
+                                        <p>✅ {language === 'es' ? 'Coach permanente individual - No estás sola' : 'Personal permanent coach - You\'re not alone'}</p>
+                                        <p>✅ {language === 'es' ? 'Privacidad total - Todo en tu dispositivo, sin servidores' : 'Complete privacy - Everything on your device, no servers'}</p>
+                                        <p>✅ {language === 'es' ? 'Información con ciencia real - Mitos desmentidos con números' : 'Science-backed information - Myths debunked with real data'}</p>
+                                        <p>✅ {language === 'es' ? 'Gráficos de tendencia - Visualiza tu evolución' : 'Trend graphs - Visualize your progress'}</p>
                                     </div>
                                 </div>
 
-                                <button onClick={() => setQuizStep(2)} className="w-full bg-gradient-to-r from-purple-400 to-yellow-200 text-white py-4 rounded-xl font-semibold hover:shadow-lg text-lg">
+                                <button onClick={() => setQuizStep(2)} className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 rounded-xl font-semibold hover:shadow-lg text-lg">
                                     {language === 'es' ? 'Siguiente' : 'Next'} →
                                 </button>
                             </div>
@@ -495,45 +475,33 @@
 
                 if (quizStep === 2) {
                     return (
-                        <div className={`min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-purple-100 to-yellow-50'} flex items-center justify-center p-4`}>
+                        <div className={`min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-purple-100 to-pink-100'} flex items-center justify-center p-4`}>
                             <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-2xl p-12 max-w-2xl w-full`}>
                                 <h2 className="text-3xl font-light gradient-text mb-8">{language === 'es' ? 'Tu Perfil' : 'Your Profile'}</h2>
                                 
-                                <div className="space-y-6 mb-8">
-                                    <div className="space-y-2">
-                                        <label className="text-lg font-semibold gradient-text">{language === 'es' ? '✨ ¿Cuál es tu nombre?' : '✨ What\'s Your Name?'}</label>
-                                        <input type="text" placeholder={language === 'es' ? 'Escribe tu nombre aquí' : 'Type your name here'} 
-                                            value={formData.profileName}
-                                            onChange={(e) => setFormData({...formData, profileName: e.target.value})}
-                                            className={`w-full px-6 py-4 text-lg border-2 rounded-lg focus:ring-2 focus:ring-purple-400 transition font-semibold ${darkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'border-purple-300 bg-white'}`}/>
-                                    </div>
+                                <div className="space-y-4 mb-8">
+                                    <input type="text" placeholder={language === 'es' ? 'Tu nombre' : 'Your name'} 
+                                        value={formData.profileName}
+                                        onChange={(e) => setFormData({...formData, profileName: e.target.value})}
+                                        className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : ''}`}/>
                                     
                                     <div className="grid grid-cols-3 gap-4">
-                                        <div>
-                                            <label className="text-sm font-semibold block mb-2">{language === 'es' ? 'Edad' : 'Age'}</label>
-                                            <input type="number" placeholder={language === 'es' ? 'Años' : 'Years'} 
-                                                value={formData.age}
-                                                onChange={(e) => setFormData({...formData, age: e.target.value})}
-                                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-400 ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'}`}/>
-                                        </div>
-                                        <div>
-                                            <label className="text-sm font-semibold block mb-2">{language === 'es' ? 'Altura (cm)' : 'Height (cm)'}</label>
-                                            <input type="number" placeholder={language === 'es' ? 'cm' : 'cm'} 
-                                                value={formData.height}
-                                                onChange={(e) => setFormData({...formData, height: e.target.value})}
-                                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-400 ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'}`}/>
-                                        </div>
-                                        <div>
-                                            <label className="text-sm font-semibold block mb-2">{language === 'es' ? 'Peso (kg)' : 'Weight (kg)'}</label>
-                                            <input type="number" placeholder={language === 'es' ? 'kg' : 'kg'} 
-                                                value={formData.weight}
-                                                onChange={(e) => setFormData({...formData, weight: e.target.value})}
-                                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-400 ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'}`}/>
-                                        </div>
+                                        <input type="number" placeholder={language === 'es' ? 'Edad' : 'Age'} 
+                                            value={formData.age}
+                                            onChange={(e) => setFormData({...formData, age: e.target.value})}
+                                            className={`px-4 py-3 border rounded-lg ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'}`}/>
+                                        <input type="number" placeholder={language === 'es' ? 'Altura (cm)' : 'Height (cm)'} 
+                                            value={formData.height}
+                                            onChange={(e) => setFormData({...formData, height: e.target.value})}
+                                            className={`px-4 py-3 border rounded-lg ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'}`}/>
+                                        <input type="number" placeholder={language === 'es' ? 'Peso (kg)' : 'Weight (kg)'} 
+                                            value={formData.weight}
+                                            onChange={(e) => setFormData({...formData, weight: e.target.value})}
+                                            className={`px-4 py-3 border rounded-lg ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'}`}/>
                                     </div>
                                 </div>
 
-                                <button onClick={() => setQuizStep(3)} className="w-full bg-gradient-to-r from-purple-400 to-yellow-200 text-white py-3 rounded-lg font-semibold hover:shadow-lg mb-4">
+                                <button onClick={() => setQuizStep(3)} className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-lg font-semibold hover:shadow-lg mb-4">
                                     {language === 'es' ? 'Siguiente' : 'Next'} →
                                 </button>
                             </div>
@@ -547,7 +515,7 @@
                         : ['Diabetes', 'Hypertension', 'Gluten-free', 'Lactose-free', 'Vegetarian', 'Vegan', 'Arthritis', 'Anxiety'];
                     
                     return (
-                        <div className={`min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-purple-100 to-yellow-50'} flex items-center justify-center p-4`}>
+                        <div className={`min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-purple-100 to-pink-100'} flex items-center justify-center p-4`}>
                             <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-2xl p-12 max-w-2xl w-full`}>
                                 <h2 className="text-3xl font-light gradient-text mb-6">{language === 'es' ? 'Restricciones' : 'Restrictions'}</h2>
                                 
@@ -555,7 +523,7 @@
                                     {conditions.map((cond, idx) => (
                                         <label key={idx} className={`flex items-center p-4 border rounded-lg cursor-pointer transition ${
                                             formData.conditions.includes(cond)
-                                                ? darkMode ? 'bg-purple-200 border-purple-300' : 'bg-purple-100 border-purple-300'
+                                                ? darkMode ? 'bg-purple-900 border-purple-600' : 'bg-purple-100 border-purple-600'
                                                 : darkMode ? 'border-gray-600' : 'border-gray-300'
                                         }`}>
                                             <input type="checkbox" 
@@ -573,7 +541,7 @@
                                     ))}
                                 </div>
 
-                                <button onClick={() => setQuizStep(4)} className="w-full bg-gradient-to-r from-purple-400 to-yellow-200 text-white py-3 rounded-lg font-semibold hover:shadow-lg">
+                                <button onClick={() => setQuizStep(4)} className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-lg font-semibold hover:shadow-lg">
                                     {language === 'es' ? 'Siguiente' : 'Next'} →
                                 </button>
                             </div>
@@ -589,7 +557,7 @@
                     ];
 
                     return (
-                        <div className={`min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-purple-100 to-yellow-50'} flex items-center justify-center p-4`}>
+                        <div className={`min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-purple-100 to-pink-100'} flex items-center justify-center p-4`}>
                             <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-2xl p-12 max-w-2xl w-full`}>
                                 <h2 className="text-3xl font-light gradient-text mb-8">{language === 'es' ? '¿Cuál es tu objetivo?' : 'What\'s Your Goal?'}</h2>
                                 
@@ -597,7 +565,7 @@
                                     {goals.map((goal) => (
                                         <label key={goal.value} className={`flex items-center p-6 border-2 rounded-xl cursor-pointer transition ${
                                             exerciseGoal === goal.value
-                                                ? darkMode ? 'bg-purple-200 border-purple-300' : 'bg-purple-100 border-purple-300'
+                                                ? darkMode ? 'bg-purple-900 border-purple-600' : 'bg-purple-100 border-purple-600'
                                                 : darkMode ? 'border-gray-600' : 'border-gray-300'
                                         }`}>
                                             <input type="radio" name="goal" value={goal.value}
@@ -609,81 +577,8 @@
                                     ))}
                                 </div>
 
-                                <button onClick={() => setQuizStep(5)} className="w-full bg-gradient-to-r from-purple-400 to-yellow-200 text-white py-3 rounded-lg font-semibold hover:shadow-lg">
-                                    {language === 'es' ? 'Siguiente' : 'Next'} →
-                                </button>
-                            </div>
-                        </div>
-                    );
-                }
-
-                if (quizStep === 5) {
-                    const regions = [
-                        { value: 'españa', label: language === 'es' ? '🇪🇸 España' : '🇪🇸 Spain' },
-                        { value: 'latam', label: language === 'es' ? '🌎 Latinoamérica' : '🌎 Latin America' },
-                        { value: 'emea', label: language === 'es' ? '🌍 Europa, Medio Oriente, Africa' : '🌍 Europe, Middle East, Africa' },
-                        { value: 'usa', label: language === 'es' ? '🇺🇸 USA & Canadá' : '🇺🇸 USA & Canada' }
-                    ];
-
-                    const periodOptions = [
-                        { value: 'regular', label: language === 'es' ? 'Ciclos regulares' : 'Regular cycles' },
-                        { value: 'irregular', label: language === 'es' ? 'Ciclos irregulares' : 'Irregular cycles' },
-                        { value: 'none', label: language === 'es' ? 'Sin período' : 'No menstruation' },
-                        { value: 'unknown', label: language === 'es' ? 'Prefiero no responder' : 'Prefer not to answer' }
-                    ];
-
-                    return (
-                        <div className={`min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-purple-100 to-yellow-50'} flex items-center justify-center p-4`}>
-                            <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-2xl p-12 max-w-2xl w-full`}>
-                                <h2 className="text-3xl font-light gradient-text mb-8">{language === 'es' ? 'Últimos Detalles' : 'Final Details'}</h2>
-                                
-                                <div className="space-y-6 mb-8">
-                                    <div>
-                                        <label className="text-sm font-semibold block mb-4">{language === 'es' ? '🌍 ¿De dónde eres?' : '🌍 Where are you from?'}</label>
-                                        <select value={formData.region || ''} onChange={(e) => setFormData({...formData, region: e.target.value})} className={`w-full px-4 py-3 border rounded-lg ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'}`}>
-                                            <option value="">{language === 'es' ? 'Selecciona tu región' : 'Select your region'}</option>
-                                            {regions.map((reg) => (
-                                                <option key={reg.value} value={reg.value}>{reg.label}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-
-                                    <div>
-                                        <label className="text-sm font-semibold block mb-4">{language === 'es' ? '📅 ¿Cómo es tu ciclo menstrual?' : '📅 How is your menstrual cycle?'}</label>
-                                        <select value={formData.periodType || ''} onChange={(e) => setFormData({...formData, periodType: e.target.value})} className={`w-full px-4 py-3 border rounded-lg ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'}`}>
-                                            <option value="">{language === 'es' ? 'Selecciona una opción' : 'Select an option'}</option>
-                                            {periodOptions.map((opt) => (
-                                                <option key={opt.value} value={opt.value}>{opt.label}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-
-                                    <div className={`${darkMode ? 'bg-gray-700' : 'bg-yellow-50'} rounded-lg p-6 space-y-4 border-l-4 border-yellow-300`}>
-                                        <h3 className="font-bold text-lg">{language === 'es' ? '⚖️ Términos Importantes' : '⚖️ Important Terms'}</h3>
-                                        
-                                        <label className="flex items-start gap-3 cursor-pointer">
-                                            <input type="checkbox" checked={legalAgreements.over18} onChange={(e) => setLegalAgreements({...legalAgreements, over18: e.target.checked})} className="mt-1 w-5 h-5"/>
-                                            <span className="text-sm">{language === 'es' ? 'Confirmo que soy mayor de 18 años' : 'I confirm I am over 18 years old'}</span>
-                                        </label>
-
-                                        <label className="flex items-start gap-3 cursor-pointer">
-                                            <input type="checkbox" checked={legalAgreements.notReplaceDoctor} onChange={(e) => setLegalAgreements({...legalAgreements, notReplaceDoctor: e.target.checked})} className="mt-1 w-5 h-5"/>
-                                            <span className="text-sm">{language === 'es' ? 'Entiendo que Lumera NO sustituye la atención médica. Siempre consulta a tu médico.' : 'I understand Lumera does NOT replace medical care. Always consult your doctor.'}</span>
-                                        </label>
-
-                                        <label className="flex items-start gap-3 cursor-pointer">
-                                            <input type="checkbox" checked={legalAgreements.privacy} onChange={(e) => setLegalAgreements({...legalAgreements, privacy: e.target.checked})} className="mt-1 w-5 h-5"/>
-                                            <span className="text-sm">{language === 'es' ? 'Entiendo que mi privacidad es prioritaria. Todos mis datos se guardan en mi dispositivo, nunca en servidores.' : 'I understand my privacy is a priority. All my data is saved on my device, never on servers.'}</span>
-                                        </label>
-                                    </div>
-                                </div>
-
                                 <button onClick={() => {
-                                    if (!legalAgreements.over18 || !legalAgreements.notReplaceDoctor || !legalAgreements.privacy) {
-                                        alert(language === 'es' ? 'Por favor, acepta todos los términos' : 'Please accept all terms');
-                                        return;
-                                    }
-                                    if (!formData.profileName || !formData.age || !formData.height || !formData.weight || !formData.region) {
+                                    if (!formData.profileName || !formData.age || !formData.height || !formData.weight) {
                                         alert(language === 'es' ? 'Completa todos los campos' : 'Complete all fields');
                                         return;
                                     }
@@ -691,47 +586,13 @@
                                     const bmr = 10 * parseFloat(formData.weight) + 6.25 * parseFloat(formData.height) - 5 * parseInt(formData.age) + 161;
                                     const tdee = Math.round(bmr * 1.55);
                                     
-                                    const newUser = { ...formData, bmi, tdee, createdAt: new Date().toISOString(), exerciseGoal, ...legalAgreements };
+                                    const newUser = { ...formData, bmi, tdee, createdAt: new Date().toISOString(), exerciseGoal };
                                     setCurrentUser(newUser);
-                                    localStorage.setItem('lumeraUser', JSON.stringify(newUser));
-                                    setQuizStep(6);
-                                }} className="w-full bg-gradient-to-r from-purple-400 to-yellow-200 text-white py-3 rounded-lg font-semibold hover:shadow-lg">
-                                    {language === 'es' ? 'Siguiente' : 'Next'} →
-                                </button>
-                            </div>
-                        </div>
-                    );
-                }
-
-                if (quizStep === 6) {
-                    return (
-                        <div className={`min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-purple-100 to-yellow-50'} flex items-center justify-center p-4`}>
-                            <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-2xl p-12 max-w-2xl w-full`}>
-                                <h2 className="text-3xl font-light gradient-text mb-4">{language === 'es' ? '📊 ¿Cómo te Sientes HOY?' : '📊 How Do You Feel TODAY?'}</h2>
-                                <p className={`text-lg mb-8 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>{language === 'es' ? 'Esto personalizará tu menú y ejercicios' : 'This will personalize your menu and exercises'}</p>
-                                
-                                <div className="space-y-8 mb-8">
-                                    {[
-                                        { key: 'energy', label: language === 'es' ? '⚡ Energía' : '⚡ Energy', emoji: '⚡' },
-                                        { key: 'sleep', label: language === 'es' ? '😴 Sueño' : '😴 Sleep', emoji: '😴' },
-                                        { key: 'mood', label: language === 'es' ? '❤️ Ánimo' : '❤️ Mood', emoji: '❤️' },
-                                        { key: 'hotFlashes', label: language === 'es' ? '🔥 Sofocos' : '🔥 Hot Flashes', emoji: '🔥' }
-                                    ].map((item) => (
-                                        <div key={item.key}>
-                                            <div className="flex justify-between mb-3">
-                                                <label className="text-lg font-semibold">{item.label}</label>
-                                                <span className="text-purple-600 font-bold text-xl">{formData[item.key] || 5}/10</span>
-                                            </div>
-                                            <input type="range" min="0" max="10" value={formData[item.key] || 5} onChange={(e) => setFormData({...formData, [item.key]: parseInt(e.target.value)})} className="w-full h-3 accent-purple-400 cursor-pointer"/>
-                                        </div>
-                                    ))}
-                                </div>
-
-                                <button onClick={() => {
+                                    localStorage.setItem('luminaUser', JSON.stringify(newUser));
                                     setShowQuiz(false);
                                     setCurrentPage('home');
-                                }} className="w-full bg-gradient-to-r from-purple-400 to-yellow-200 text-white py-4 rounded-lg font-semibold hover:shadow-lg text-lg">
-                                    {language === 'es' ? '¡Comenzar mi Viaje! 💜' : 'Start My Journey! 💜'}
+                                }} className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-lg font-semibold hover:shadow-lg">
+                                    {language === 'es' ? '¡Comenzar!' : 'Let\'s Go!'} ✨
                                 </button>
                             </div>
                         </div>
@@ -744,9 +605,9 @@
                 if (!currentUser) return null;
                 return (
                     <div className="pb-32 space-y-8" key={language}>
-                        <div className="bg-gradient-to-r from-purple-400 to-yellow-200 text-white rounded-2xl p-8 shadow-lg">
+                        <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-2xl p-8 shadow-lg">
                             <h1 className="text-4xl font-light mb-3">{language === 'es' ? `¡Bienvenida, ${currentUser.profileName}! 💜` : `Welcome, ${currentUser.profileName}! 💜`}</h1>
-                            <p className="text-lg opacity-90">{language === 'es' ? 'Tu transformación es un acto de gracia. Cada día es una oportunidad para escuchar tu cuerpo, honrar sus cambios y fortalecerte. Lumera está aquí, contigo, en cada paso.' : 'Your transformation is an act of grace. Every day is an opportunity to listen to your body, honor its changes and strengthen yourself. Lumera is here, with you, every step of the way.'}</p>
+                            <p className="text-lg opacity-90">{language === 'es' ? 'Tu transformación es un acto de gracia. Cada día es una oportunidad para escuchar tu cuerpo, honrar sus cambios y fortalecerte. Lumina está aquí, contigo, en cada paso.' : 'Your transformation is an act of grace. Every day is an opportunity to listen to your body, honor its changes and strengthen yourself. Lumina is here, with you, every step of the way.'}</p>
                         </div>
 
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -793,10 +654,10 @@
                         </div>
 
                         <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-8 space-y-6`}>
-                            <h2 className="text-2xl font-semibold gradient-text">{language === 'es' ? '✨ Diferenciadores de Lumera' : '✨ What Makes Lumera Different'}</h2>
+                            <h2 className="text-2xl font-semibold gradient-text">{language === 'es' ? '✨ Diferenciadores de Lumina' : '✨ What Makes Lumina Different'}</h2>
                             
                             <div className="grid md:grid-cols-2 gap-6">
-                                <div className={`${darkMode ? 'bg-gray-700' : 'bg-purple-100'} rounded-lg p-6 border-l-4 border-purple-300`}>
+                                <div className={`${darkMode ? 'bg-gray-700' : 'bg-purple-50'} rounded-lg p-6 border-l-4 border-purple-600`}>
                                     <h4 className={`font-bold mb-3 ${darkMode ? 'text-purple-300' : 'text-purple-900'}`}>🥗 {language === 'es' ? 'Menús Personalizados 7 Días' : 'Personalized 7-Day Menus'}</h4>
                                     <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{language === 'es' ? '4 comidas diarias adaptadas a tus restricciones. No dietas genéricas, sino nutrición personalizada para TI. Basada en tu IMC y TDEE para resultados reales.' : '4 daily meals adapted to your restrictions. Not generic diets, but personalized nutrition for YOU. Based on your BMI and TDEE for real results.'}</p>
                                 </div>
@@ -828,63 +689,21 @@
                 const mealLabels = language === 'es' ? { Desayuno: 'Desayuno', Almuerzo: 'Almuerzo', Cena: 'Cena', Snack: 'Snack' } : { Desayuno: 'Breakfast', Almuerzo: 'Lunch', Cena: 'Dinner', Snack: 'Snack' };
                 const menus = getWeekMenus();
 
-                // Coach IA que aprende de síntomas
-                const getCoachMessage = () => {
-                    const energy = formData.energy || 5;
-                    const sleep = formData.sleep || 5;
-                    const hotFlashes = formData.hotFlashes || 0;
-                    
-                    let message = '';
-                    if (language === 'es') {
-                        if (energy < 4 && hotFlashes > 6) {
-                            message = '📌 Vi que tienes baja energía y muchos sofocos. Este menú enfatiza alimentos antiinflamatorios y ricos en magnesio para calmar y energizar.';
-                        } else if (sleep < 4) {
-                            message = '📌 Noté que duermes poco. He incluido alimentos ricos en triptófano y magnesio para mejorar tu descanso.';
-                        } else if (hotFlashes > 7) {
-                            message = '📌 Los síntomas de sofocos están altos. Este menú prioriza alimentos que regulan temperatura corporal.';
-                        } else if (energy > 8) {
-                            message = '📌 ¡Tu energía está al máximo! He incluido proteína de calidad para mantener esa vitalidad.';
-                        } else {
-                            message = '📌 Tu cuerpo está en balance. Este menú personalizado responde a cómo te sientes hoy.';
-                        }
-                    } else {
-                        if (energy < 4 && hotFlashes > 6) {
-                            message = '📌 I noticed low energy and high hot flashes. This menu emphasizes anti-inflammatory and magnesium-rich foods to calm and energize you.';
-                        } else if (sleep < 4) {
-                            message = '📌 I noticed you sleep little. I\'ve included foods rich in tryptophan and magnesium to improve your rest.';
-                        } else if (hotFlashes > 7) {
-                            message = '📌 Hot flash symptoms are high. This menu prioritizes foods that regulate body temperature.';
-                        } else if (energy > 8) {
-                            message = '📌 Your energy is at maximum! I\'ve included quality protein to maintain that vitality.';
-                        } else {
-                            message = '📌 Your body is in balance. This personalized menu responds to how you feel today.';
-                        }
-                    }
-                    return message;
-                };
-
                 return (
                     <div className="pb-32 space-y-8" key={`nutrition-${language}`}>
-                        <div>
-                            <h2 className="text-4xl font-light gradient-text mb-2">🥗 {t[language].nutrition}</h2>
-                            <p className={`text-lg ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>{language === 'es' ? 'Menú de 7 días personalizado para ti' : 'Personalized 7-day menu for you'}</p>
-                        </div>
-
-                        <div className={`${darkMode ? 'bg-purple-900 bg-opacity-30' : 'bg-purple-50'} rounded-xl p-6 border-l-4 border-purple-300`}>
-                            <p className={`text-lg ${darkMode ? 'text-purple-200' : 'text-purple-900'}`}>🤖 {getCoachMessage()}</p>
-                        </div>
+                        <h2 className="text-3xl font-light gradient-text">{t[language].nutrition}</h2>
 
                         {daysOrder.map((day, dayIdx) => {
                             const recipes = menus[language === 'es' ? 'es' : 'en'][day] || [];
                             return (
                                 <div key={day} className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-lg overflow-hidden`}>
-                                    <div className="bg-gradient-to-r from-purple-400 to-yellow-200 text-white p-6">
+                                    <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-6">
                                         <h3 className="text-2xl font-semibold">📅 {daysLabels[dayIdx]}</h3>
                                     </div>
 
                                     <div className="p-6 space-y-6">
                                         {recipes.map((recipe, idx) => (
-                                            <div key={idx} className={`${darkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-xl p-6 border-l-4 border-purple-300`}>
+                                            <div key={idx} className={`${darkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-xl p-6 border-l-4 border-purple-600`}>
                                                 <div className="flex justify-between items-start mb-4">
                                                     <div>
                                                         <h4 className="text-xl font-semibold">{recipe.name}</h4>
@@ -899,7 +718,7 @@
                                                         <div className="space-y-2 text-sm">
                                                             {recipe.ingredients.map((ing, i) => (
                                                                 <div key={i}>
-                                                                    <p className="font-medium">{ing.name}: <span className="text-purple-400">{ing.qty}{ing.unit}</span></p>
+                                                                    <p className="font-medium">{ing.name}: <span className="text-purple-600">{ing.qty}{ing.unit}</span></p>
                                                                     <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>{ing.why}</p>
                                                                 </div>
                                                             ))}
@@ -943,7 +762,7 @@
 
                         <div className="flex gap-4 overflow-x-auto pb-4">
                             {['strength', 'weightLoss', 'hormonal'].map((goal) => (
-                                <button key={goal} onClick={() => setExerciseGoal(goal)} className={`px-6 py-3 rounded-lg font-semibold whitespace-nowrap transition ${exerciseGoal === goal ? 'bg-purple-400 text-white' : darkMode ? 'bg-gray-800 text-gray-300' : 'bg-gray-200 text-gray-700'}`}>
+                                <button key={goal} onClick={() => setExerciseGoal(goal)} className={`px-6 py-3 rounded-lg font-semibold whitespace-nowrap transition ${exerciseGoal === goal ? 'bg-purple-600 text-white' : darkMode ? 'bg-gray-800 text-gray-300' : 'bg-gray-200 text-gray-700'}`}>
                                     {goal === 'strength' ? t[language].strength : goal === 'weightLoss' ? t[language].weightLoss : t[language].hormonal}
                                 </button>
                             ))}
@@ -1023,9 +842,9 @@
                                     <div key={item.key}>
                                         <div className="flex justify-between mb-2">
                                             <label className="text-sm font-semibold">{item.emoji} {item.label}</label>
-                                            <span className="text-purple-400 font-bold">{symptomForm[item.key]}/10</span>
+                                            <span className="text-purple-600 font-bold">{symptomForm[item.key]}/10</span>
                                         </div>
-                                        <input type="range" min="0" max="10" value={symptomForm[item.key]} onChange={(e) => setSymptomForm({...symptomForm, [item.key]: parseInt(e.target.value)})} className="w-full accent-purple-400"/>
+                                        <input type="range" min="0" max="10" value={symptomForm[item.key]} onChange={(e) => setSymptomForm({...symptomForm, [item.key]: parseInt(e.target.value)})} className="w-full accent-purple-600"/>
                                     </div>
                                 ))}
 
@@ -1039,7 +858,7 @@
                                 setSymptoms([...symptoms, symptomForm]);
                                 setSymptomForm({ sleep: 5, energy: 5, mood: 5, hotFlashes: 0, anxiety: 5, date: new Date().toISOString().split('T')[0] });
                                 alert(language === 'es' ? 'Síntoma registrado ✓' : 'Symptom recorded ✓');
-                            }} className="w-full bg-gradient-to-r from-purple-400 to-yellow-200 text-white py-3 rounded-lg font-semibold hover:shadow-lg">
+                            }} className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-lg font-semibold hover:shadow-lg">
                                 {t[language].addRecord}
                             </button>
                         </div>
@@ -1074,7 +893,7 @@
                                             const doc = new jsPDF();
                                             
                                             doc.setFontSize(20);
-                                            doc.text('Lumera - Reporte de Síntomas', 20, 20);
+                                            doc.text('Lumina - Reporte de Síntomas', 20, 20);
                                             
                                             doc.setFontSize(12);
                                             doc.text(`${language === 'es' ? 'Usuaria' : 'User'}: ${currentUser.profileName}`, 20, 40);
@@ -1093,7 +912,7 @@
                                             
                                             doc.text(`${language === 'es' ? 'Total de registros' : 'Total records'}: ${symptoms.length}`, 20, 120);
                                             
-                                            doc.save(`Lumera_Sintomas_${new Date().toISOString().split('T')[0]}.pdf`);
+                                            doc.save(`Lumina_Sintomas_${new Date().toISOString().split('T')[0]}.pdf`);
                                         }} className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700">
                                             📥 {language === 'es' ? 'Descargar PDF' : 'Download PDF'}
                                         </button>
@@ -1171,7 +990,7 @@
                                             const doc = new jsPDF();
                                             
                                             doc.setFontSize(20);
-                                            doc.text('Lumera - Reporte de Período', 20, 20);
+                                            doc.text('Lumina - Reporte de Período', 20, 20);
                                             
                                             doc.setFontSize(12);
                                             doc.text(`${language === 'es' ? 'Usuaria' : 'User'}: ${currentUser.profileName}`, 20, 40);
@@ -1188,7 +1007,7 @@
                                             doc.text(`${language === 'es' ? 'Duración promedio' : 'Avg duration'}: ${avgDuration} días`, 20, 95);
                                             doc.text(`${language === 'es' ? 'Total de ciclos registrados' : 'Total cycles recorded'}: ${periodLog.length}`, 20, 105);
                                             
-                                            doc.save(`Lumera_Periodo_${new Date().toISOString().split('T')[0]}.pdf`);
+                                            doc.save(`Lumina_Periodo_${new Date().toISOString().split('T')[0]}.pdf`);
                                         }} className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700">
                                             📥 {language === 'es' ? 'Descargar PDF' : 'Download PDF'}
                                         </button>
@@ -1219,10 +1038,7 @@
                 
                 return (
                     <div className="pb-32 space-y-6" key={`myths-${language}`}>
-                        <div className={`${darkMode ? 'bg-red-900 bg-opacity-30' : 'bg-red-50'} rounded-xl p-8 border-l-4 border-red-600`}>
-                            <h2 className="text-5xl font-light mb-3">❌ {language === 'es' ? 'Mitos' : 'Myths'}</h2>
-                            <p className={`text-xl ${darkMode ? 'text-red-200' : 'text-red-900'}`}>{language === 'es' ? 'Desmintiendo creencias que no son ciertas' : 'Debunking beliefs that are not true'}</p>
-                        </div>
+                        <h2 className="text-3xl font-light gradient-text">{t[language].myths}</h2>
                         
                         {myths && Array.isArray(myths) && myths.length > 0 ? myths.map((myth, idx) => (
                             <div key={idx} className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg overflow-hidden`}>
@@ -1240,7 +1056,7 @@
                                         <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{myth.science}</p>
                                     </div>
 
-                                    <div className={`${darkMode ? 'bg-gray-700' : 'bg-purple-100'} border-l-4 border-purple-300 p-4 rounded-lg`}>
+                                    <div className={`${darkMode ? 'bg-gray-700' : 'bg-purple-50'} border-l-4 border-purple-600 p-4 rounded-lg`}>
                                         <p className={`font-semibold mb-2 ${darkMode ? 'text-purple-300' : 'text-purple-900'}`}>💡 {language === 'es' ? 'Qué Hacer' : 'What to Do'}</p>
                                         <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{myth.action}</p>
                                     </div>
@@ -1265,7 +1081,7 @@
                         
                         {tips.map((tip, idx) => (
                             <div key={idx} className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg overflow-hidden`}>
-                                <div className="bg-gradient-to-r from-purple-400 to-yellow-200 text-white p-6">
+                                <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-6">
                                     <h3 className="text-2xl font-semibold">{tip.emoji} {tip.title}</h3>
                                 </div>
 
@@ -1308,35 +1124,9 @@
 
             // COMUNIDAD
             const renderCommunity = () => {
-                const defaultStories = language === 'es' ? [
-                    { name: 'María, 48', story: 'Pensé que me volvía loca. Los sofocos eran insoportables. Empecé a usar Lumera y cambió todo. Ahora duermo 7 horas, entiendo mis síntomas y no me siento tan sola. ¡Gracias!', date: '15/12/2024' },
-                    { name: 'Carmen, 52', story: 'El menú personalizado de Lumera fue increíble. Dejé de sentir culpa con la comida. Ahora como bien, mantengo mi peso y tengo más energía. Mi médico está sorprendida.', date: '14/12/2024' },
-                    { name: 'Rosa, 50', story: 'Lo que más me ayudó fueron los síntomas registrados. Ver las gráficas me hizo comprender patrones que nunca había notado. Lumera es mi coach personal.', date: '13/12/2024' }
-                ] : [
-                    { name: 'Maria, 48', story: 'I thought I was going crazy. The hot flashes were unbearable. I started using Lumera and everything changed. Now I sleep 7 hours, understand my symptoms and don\'t feel so alone. Thank you!', date: '15/12/2024' },
-                    { name: 'Carmen, 52', story: 'Lumera\'s personalized menu was incredible. I stopped feeling guilty about food. Now I eat well, maintain my weight and have more energy. My doctor is surprised.', date: '14/12/2024' },
-                    { name: 'Rosa, 50', story: 'What helped me most was tracking my symptoms. Seeing the graphs made me understand patterns I had never noticed. Lumera is my personal coach.', date: '13/12/2024' }
-                ];
-
                 return (
                     <div className="pb-32 space-y-8" key={`community-${language}`}>
-                        <div>
-                            <h2 className="text-4xl font-light gradient-text mb-2">💜 {t[language].community}</h2>
-                            <p className={`text-lg ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>{language === 'es' ? 'Historias reales de mujeres como tú' : 'Real stories from women like you'}</p>
-                        </div>
-
-                        <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-6`}>
-                            <h3 className="font-semibold text-lg mb-6">{language === 'es' ? '✨ Vivencias de la Comunidad' : '✨ Community Experiences'}</h3>
-                            <div className="grid md:grid-cols-1 gap-6 mb-8">
-                                {defaultStories.map((story, idx) => (
-                                    <div key={idx} className={`${darkMode ? 'bg-gray-700' : 'bg-gradient-to-r from-purple-50 to-yellow-50'} rounded-xl p-6 border-l-4 border-purple-300`}>
-                                        <h4 className="font-semibold text-purple-600 mb-2">👩 {story.name}</h4>
-                                        <p className={`italic text-lg ${darkMode ? 'text-gray-300' : 'text-gray-800'} mb-3 leading-relaxed`}>"{story.story}"</p>
-                                        <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>📅 {story.date}</p>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
+                        <h2 className="text-3xl font-light gradient-text">{t[language].community}</h2>
                         
                         <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-6`}>
                             <h3 className="font-semibold text-lg mb-4">{language === 'es' ? '💜 Comparte tu Historia' : '💜 Share Your Story'}</h3>
@@ -1347,17 +1137,17 @@
                                     setCommunityMessage('');
                                     alert(language === 'es' ? '¡Mensaje compartido! 💜' : 'Message shared! 💜');
                                 }
-                            }} className="w-full bg-gradient-to-r from-purple-400 to-yellow-200 text-white py-3 rounded-lg font-semibold hover:shadow-lg">
+                            }} className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-lg font-semibold hover:shadow-lg">
                                 {language === 'es' ? 'Compartir Mensaje' : 'Share Message'}
                             </button>
                         </div>
 
                         {userMessages.length > 0 && (
                             <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-6`}>
-                                <h3 className="font-semibold text-lg mb-6">{language === 'es' ? 'Tus Historias' : 'Your Stories'}</h3>
+                                <h3 className="font-semibold text-lg mb-6">{language === 'es' ? 'Historias de Nuestra Comunidad' : 'Community Stories'}</h3>
                                 <div className="grid md:grid-cols-2 gap-6">
                                     {userMessages.map((msg, idx) => (
-                                        <div key={idx} className={`${darkMode ? 'bg-gray-700' : 'bg-purple-100'} rounded-xl p-6 border-l-4 border-purple-300`}>
+                                        <div key={idx} className={`${darkMode ? 'bg-gray-700' : 'bg-purple-50'} rounded-xl p-6 border-l-4 border-purple-600`}>
                                             <h4 className="font-semibold mb-2">👩 {msg.name}</h4>
                                             <p className={`italic ${darkMode ? 'text-gray-300' : 'text-gray-700'} mb-3`}>"{msg.story}"</p>
                                             <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>📅 {msg.date}</p>
@@ -1393,21 +1183,7 @@
                 <div className={darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50'}>
                     <header className={`${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} shadow sticky top-0 z-40 border-b`}>
                         <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-                            <div className="flex items-center gap-3">
-                                <svg width="32" height="32" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-                                    <defs>
-                                        <linearGradient id="flameGradHeader" x1="0%" y1="0%" x2="0%" y2="100%">
-                                            <stop offset="0%" style={{stopColor:'#d4af7f',stopOpacity:1}} />
-                                            <stop offset="100%" style={{stopColor:'#e8c89f',stopOpacity:1}} />
-                                        </linearGradient>
-                                    </defs>
-                                    {/* Media Luna */}
-                                    <path d="M 32 12 A 20 20 0 0 0 32 52 A 16 16 0 0 1 32 16 Z" fill="#b8a8d8"/>
-                                    {/* Llama minimalista */}
-                                    <path d="M 40 32 Q 40 26 42 22 Q 42 28 40 35 Q 38 28 38 22 Q 40 26 40 32" fill="url(#flameGradHeader)"/>
-                                </svg>
-                                <h1 className="text-2xl font-light gradient-text">Lumera</h1>
-                            </div>
+                            <h1 className="text-2xl font-light gradient-text">✨ Lumina</h1>
                             <div className="flex items-center gap-3">
                                 <select value={language} onChange={(e) => setLanguage(e.target.value)} className={`px-3 py-2 rounded text-sm border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-100 border-gray-300'}`}>
                                     <option value="es">🇪🇸</option>
@@ -1443,7 +1219,7 @@
                                 <button key={item.page} onClick={() => setCurrentPage(item.page)}
                                     className={`py-4 px-3 text-xs sm:text-sm border-t-4 transition whitespace-nowrap ${
                                         currentPage === item.page
-                                            ? `border-purple-300 ${darkMode ? 'bg-gray-700' : 'bg-purple-100'} text-purple-400`
+                                            ? `border-purple-600 ${darkMode ? 'bg-gray-700' : 'bg-purple-50'} text-purple-600`
                                             : `${darkMode ? 'border-gray-700 text-gray-400' : 'border-gray-200 text-gray-600'}`
                                     }`}>
                                     <div>{item.emoji}</div>
@@ -1457,7 +1233,7 @@
         };
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<LumeraApp />);
+        root.render(<LuminaApp />);
     </script>
 </body>
 </html>
