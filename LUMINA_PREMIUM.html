@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lumina - Your Wellness Companion</title>
+    
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Stripe -->
+    <script src="https://js.stripe.com/v3/"></script>
+    
+    <!-- React -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    
+    <!-- PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * { font-family: 'Lato', sans-serif; }
+        h1, h2, h3 { font-family: 'Playfair Display', serif; }
+        .gradient-text { 
+            background: linear-gradient(135deg, #9333ea 0%, #ec4899 100%); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // ============================================================
+        // CONFIGURACIÓN
+        // ============================================================
+        const SUPABASE_URL = 'https://pyekwpmbdnmglrjieexc.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB5ZWt3cG1iZG5tZ2xyamllZXhjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzMyNDk2MzMsImV4cCI6MjA0ODgyNTYzM30.VYOuFW_kZhсмрт3xCEqS9vL5zYN2eJxH_wKqVGBJmc';
+        const BACKEND_URL = 'https://lumera-backend-production.up.railway.app';
+        const STRIPE_PUBLISHABLE_KEY = 'pk_test_51Sejh162SZ6DF120ogS0E67ngoK4aE2C2xRW0pMJcfwWxaQq1UJ7';
+
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const stripe = window.Stripe(STRIPE_PUBLISHABLE_KEY);
+
+        const PRICES = {
+            latam: { id: 'price_1Sejoa62SZ6DF12Ox5sU1Y9v', price: '$4.99', currency: 'USD', original: '$8.32' },
+            emea: { id: 'price_1Sejso62SZ6DF12O5eSsNiGQ', price: '€4.99', currency: 'EUR', original: '€8.32' },
+            usa: { id: 'price_1Sejuh62SZ6DF12OUR0k19Rd', price: '$6.99', currency: 'USD', original: '$11.65' }
+        };
+
+        // ============================================================
+        // COMPONENTE PRINCIPAL
+        // ============================================================
+        const LuminaApp = () => {
+            const [language, setLanguage] = useState('es');
+            const [darkMode, setDarkMode] = useState(false);
+            const [currentUser, setCurrentUser] = useState(null);
+            const [session, setSession] = useState(null);
+            const [currentPage, setCurrentPage] = useState('home');
+            const [loading, setLoading] = useState(true);
+            
+            // Auth
+            const [authView, setAuthView] = useState('login');
+            const [loginForm, setLoginForm] = useState({ email: '', password: '' });
+            const [registerForm, setRegisterForm] = useState({ 
+                email: '', 
+                password: '', 
+                name: '',
+                age: '',
+                height: '',
+                weight: '',
+                region: 'latam',
+                exerciseGoal: 'hormonal'
+            });
+
+            // Traducciones
+            const t = {
+                es: {
+                    login: 'Iniciar Sesión',
+                    register: 'Registrarse',
+                    logout: 'Cerrar Sesión',
+                    email: 'Email',
+                    password: 'Contraseña',
+                    name: 'Nombre',
+                    age: 'Edad',
+                    height: 'Altura (cm)',
+                    weight: 'Peso (kg)',
+                    region: 'Región',
+                    goal: 'Objetivo',
+                    home: 'Inicio',
+                    nutrition: 'Nutrición',
+                    exercise: 'Ejercicio',
+                    symptoms: 'Síntomas',
+                    upgradeNow: 'Mejorar Ahora',
+                    premium: 'Premium',
+                    strength: 'Ganar Fuerza',
+                    weightLoss: 'Perder Peso',
+                    hormonal: 'Equilibrio Hormonal'
+                },
+                en: {
+                    login: 'Login',
+                    register: 'Register',
+                    logout: 'Logout',
+                    email: 'Email',
+                    password: 'Password',
+                    name: 'Name',
+                    age: 'Age',
+                    height: 'Height (cm)',
+                    weight: 'Weight (kg)',
+                    region: 'Region',
+                    goal: 'Goal',
+                    home: 'Home',
+                    nutrition: 'Nutrition',
+                    exercise: 'Exercise',
+                    symptoms: 'Symptoms',
+                    upgradeNow: 'Upgrade Now',
+                    premium: 'Premium',
+                    strength: 'Build Strength',
+                    weightLoss: 'Lose Weight',
+                    hormonal: 'Hormonal Balance'
+                }
+            };
+
+            // ============================================================
+            // AUTH
+            // ============================================================
+            useEffect(() => {
+                checkUser();
+                
+                const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+                    setSession(session);
+                    if (session) {
+                        await loadUserProfile(session.user.id);
+                    } else {
+                        setCurrentUser(null);
+                        setLoading(false);
+                    }
+                });
+
+                return () => {
+                    authListener?.subscription?.unsubscribe();
+                };
+            }, []);
+
+            const checkUser = async () => {
+                try {
+                    const { data: { session } } = await supabase.auth.getSession();
+                    setSession(session);
+                    
+                    if (session) {
+                        await loadUserProfile(session.user.id);
+                    } else {
+                        setLoading(false);
+                    }
+                } catch (error) {
+                    console.error('Error checking user:', error);
+                    setLoading(false);
+                }
+            };
+
+            const loadUserProfile = async (userId) => {
+                try {
+                    const { data, error } = await supabase
+                        .from('users')
+                        .select('*')
+                        .eq('id', userId)
+                        .single();
+
+                    if (error) throw error;
+
+                    if (data) {
+                        setCurrentUser(data);
+                    }
+                    setLoading(false);
+                } catch (error) {
+                    console.error('Error loading profile:', error);
+                    setLoading(false);
+                }
+            };
+
+            const handleLogin = async (e) => {
+                e.preventDefault();
+                try {
+                    const { error } = await supabase.auth.signInWithPassword({
+                        email: loginForm.email,
+                        password: loginForm.password
+                    });
+
+                    if (error) throw error;
+                    
+                    alert(language === 'es' ? '¡Bienvenida de nuevo!' : 'Welcome back!');
+                } catch (error) {
+                    alert(error.message);
+                }
+            };
+
+            const handleRegister = async (e) => {
+                e.preventDefault();
+                
+                if (!registerForm.email || !registerForm.password || !registerForm.name) {
+                    alert(language === 'es' ? 'Por favor completa todos los campos' : 'Please complete all fields');
+                    return;
+                }
+
+                try {
+                    const { data: authData, error: authError } = await supabase.auth.signUp({
+                        email: registerForm.email,
+                        password: registerForm.password
+                    });
+
+                    if (authError) throw authError;
+
+                    const bmi = (parseFloat(registerForm.weight) / ((parseFloat(registerForm.height) / 100) ** 2)).toFixed(1);
+                    const bmr = 10 * parseFloat(registerForm.weight) + 6.25 * parseFloat(registerForm.height) - 5 * parseInt(registerForm.age) + 161;
+                    const tdee = Math.round(bmr * 1.55);
+
+                    const { error: profileError } = await supabase
+                        .from('users')
+                        .insert([{
+                            id: authData.user.id,
+                            email: registerForm.email,
+                            name: registerForm.name,
+                            age: parseInt(registerForm.age),
+                            height: parseFloat(registerForm.height),
+                            weight: parseFloat(registerForm.weight),
+                            bmi: parseFloat(bmi),
+                            tdee: tdee,
+                            region: registerForm.region,
+                            exercise_goal: registerForm.exerciseGoal,
+                            language: language,
+                            subscription_status: 'free'
+                        }]);
+
+                    if (profileError) throw profileError;
+
+                    alert(language === 'es' ? '¡Cuenta creada! Por favor verifica tu email.' : 'Account created! Please verify your email.');
+                    setAuthView('login');
+                } catch (error) {
+                    alert(error.message);
+                }
+            };
+
+            const handleLogout = async () => {
+                await supabase.auth.signOut();
+                setCurrentUser(null);
+                setSession(null);
+                setCurrentPage('home');
+            };
+
+            // ============================================================
+            // STRIPE
+            // ============================================================
+            const handleSubscribe = async () => {
+                if (!currentUser) {
+                    alert(language === 'es' ? 'Por favor inicia sesión primero' : 'Please login first');
+                    return;
+                }
+
+                try {
+                    const region = currentUser.region || 'latam';
+                    const priceId = PRICES[region].id;
+
+                    const response = await fetch(`${BACKEND_URL}/api/create-checkout-session`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            userId: currentUser.id,
+                            email: currentUser.email,
+                            priceId: priceId,
+                            region: region,
+                            applyCoupon: true
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        window.location.href = data.url;
+                    } else {
+                        throw new Error(data.error);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert(language === 'es' ? 'Error al procesar el pago' : 'Error processing payment');
+                }
+            };
+
+            const isPremium = () => {
+                return currentUser && currentUser.subscription_status === 'active';
+            };
+
+            // ============================================================
+            // UPGRADE PROMPT
+            // ============================================================
+            const UpgradePrompt = () => (
+                <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-2xl p-12 max-w-2xl mx-auto mt-20`}>
+                    <div className="text-center mb-8">
+                        <h2 className="text-4xl font-light gradient-text mb-4">✨ {language === 'es' ? 'Contenido Premium' : 'Premium Content'}</h2>
+                        <p className="text-lg text-gray-600 dark:text-gray-400">
+                            {language === 'es' 
+                                ? 'Esta función está disponible solo para miembros premium.' 
+                                : 'This feature is available for premium members only.'}
+                        </p>
+                    </div>
+
+                    <div className={`${darkMode ? 'bg-gray-700' : 'bg-purple-50'} rounded-xl p-8 mb-8`}>
+                        <h3 className="font-bold text-lg mb-4">{language === 'es' ? '💎 Beneficios Premium:' : '💎 Premium Benefits:'}</h3>
+                        <ul className="space-y-3 text-sm">
+                            <li>✅ {language === 'es' ? 'Menús personalizados 7 días' : 'Personalized 7-day menus'}</li>
+                            <li>✅ {language === 'es' ? 'Rutinas de ejercicio adaptadas' : 'Adapted exercise routines'}</li>
+                            <li>✅ {language === 'es' ? 'Seguimiento de síntomas con gráficos' : 'Symptom tracking with charts'}</li>
+                            <li>✅ {language === 'es' ? 'Registro de período con tendencias' : 'Period tracking with trends'}</li>
+                            <li>✅ {language === 'es' ? 'Acceso a talleres exclusivos' : 'Access to exclusive workshops'}</li>
+                            <li>✅ {language === 'es' ? 'Comunidad privada' : 'Private community'}</li>
+                        </ul>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-4 mb-8">
+                        {Object.entries(PRICES).map(([key, value]) => (
+                            <div key={key} className={`${darkMode ? 'bg-gray-700' : 'bg-white'} rounded-xl p-6 text-center border-2 ${currentUser?.region === key ? 'border-purple-600' : 'border-gray-300'}`}>
+                                <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">{key.toUpperCase()}</p>
+                                <p className="text-sm text-gray-500 line-through">{value.original}</p>
+                                <p className="text-3xl font-bold gradient-text">{value.price}</p>
+                                <p className="text-xs text-gray-500">/mes</p>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className={`${darkMode ? 'bg-yellow-900' : 'bg-yellow-50'} border-l-4 border-yellow-500 p-4 mb-8`}>
+                        <p className="font-semibold text-sm text-yellow-900 dark:text-yellow-200">
+                            🎉 {language === 'es' ? 'LAUNCH40: 40% descuento primer mes' : 'LAUNCH40: 40% off first month'}
+                        </p>
+                    </div>
+
+                    <button onClick={handleSubscribe} className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 rounded-xl font-semibold text-lg hover:shadow-lg transition">
+                        {t[language].upgradeNow} 🚀
+                    </button>
+                </div>
+            );
+
+            // ============================================================
+            // AUTH SCREEN
+            // ============================================================
+            const renderAuth = () => {
+                if (authView === 'login') {
+                    return (
+                        <div className={`min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-purple-100 to-pink-100'} flex items-center justify-center p-4`}>
+                            <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-2xl p-12 max-w-md w-full`}>
+                                <h1 className="text-4xl font-light gradient-text mb-8 text-center">✨ Lumina</h1>
+                                
+                                <form onSubmit={handleLogin} className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-semibold mb-2">{t[language].email}</label>
+                                        <input 
+                                            type="email" 
+                                            value={loginForm.email}
+                                            onChange={(e) => setLoginForm({...loginForm, email: e.target.value})}
+                                            className={`w-full px-4 py-3 border rounded-lg ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'}`}
+                                            required
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-semibold mb-2">{t[language].password}</label>
+                                        <input 
+                                            type="password"
+                                            value={loginForm.password}
+                                            onChange={(e) => setLoginForm({...loginForm, password: e.target.value})}
+                                            className={`w-full px-4 py-3 border rounded-lg ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'}`}
+                                            required
+                                        />
+                                    </div>
+
+                                    <button type="submit" className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-lg font-semibold hover:shadow-lg transition">
+                                        {t[language].login}
+                                    </button>
+                                </form>
+
+                                <div className="mt-6 text-center">
+                                    <button onClick={() => setAuthView('register')} className="text-purple-600 hover:underline text-sm">
+                                        {language === 'es' ? '¿No tienes cuenta? Regístrate' : "Don't have an account? Register"}
+                                    </button>
+                                </div>
+
+                                <div className="mt-8 flex justify-center gap-2">
+                                    <button onClick={() => setLanguage('es')} className={`px-3 py-1 rounded ${language === 'es' ? 'bg-purple-600 text-white' : 'bg-gray-200'}`}>🇪🇸</button>
+                                    <button onClick={() => setLanguage('en')} className={`px-3 py-1 rounded ${language === 'en' ? 'bg-purple-600 text-white' : 'bg-gray-200'}`}>🇬🇧</button>
+                                </div>
+                            </div>
+                        </div>
+                    );
+                }
+
+                if (authView === 'register') {
+                    return (
+                        <div className={`min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-purple-100 to-pink-100'} flex items-center justify-center p-4`}>
+                            <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-2xl p-12 max-w-2xl w-full`}>
+                                <h1 className="text-4xl font-light gradient-text mb-8 text-center">{language === 'es' ? 'Crear Cuenta' : 'Create Account'}</h1>
+                                
+                                <form onSubmit={handleRegister} className="space-y-4">
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-semibold mb-2">{t[language].email}</label>
+                                            <input 
+                                                type="email"
+                                                value={registerForm.email}
+                                                onChange={(e) => setRegisterForm({...registerForm, email: e.target.value})}
+                                                className={`w-full px-4 py-3 border rounded-lg ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'}`}
+                                                required
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-semibold mb-2">{t[language].password}</label>
+                                            <input 
+                                                type="password"
+                                                value={registerForm.password}
+                                                onChange={(e) => setRegisterForm({...registerForm, password: e.target.value})}
+                                                className={`w-full px-4 py-3 border rounded-lg ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'}`}
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-semibold mb-2">{t[language].name}</label>
+                                        <input 
+                                            type="text"
+                                            value={registerForm.name}
+                                            onChange={(e) => setRegisterForm({...registerForm, name: e.target.value})}
+                                            className={`w-full px-4 py-3 border rounded-lg ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'}`}
+                                            required
+                                        />
+                                    </div>
+
+                                    <div className="grid grid-cols-3 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-semibold mb-2">{t[language].age}</label>
+                                            <input 
+                                                type="number"
+                                                value={registerForm.age}
+                                                onChange={(e) => setRegisterForm({...registerForm, age: e.target.value})}
+                                                className={`w-full px-4 py-3 border rounded-lg ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'}`}
+                                                required
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-semibold mb-2">{t[language].height}</label>
+                                            <input 
+                                                type="number"
+                                                value={registerForm.height}
+                                                onChange={(e) => setRegisterForm({...registerForm, height: e.target.value})}
+                                                className={`w-full px-4 py-3 border rounded-lg ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'}`}
+                                                required
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-semibold mb-2">{t[language].weight}</label>
+                                            <input 
+                                                type="number"
+                                                value={registerForm.weight}
+                                                onChange={(e) => setRegisterForm({...registerForm, weight: e.target.value})}
+                                                className={`w-full px-4 py-3 border rounded-lg ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'}`}
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-semibold mb-2">{t[language].region}</label>
+                                        <select 
+                                            value={registerForm.region}
+                                            onChange={(e) => setRegisterForm({...registerForm, region: e.target.value})}
+                                            className={`w-full px-4 py-3 border rounded-lg ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'}`}
+                                        >
+                                            <option value="latam">Latinoamérica</option>
+                                            <option value="emea">Europa/EMEA</option>
+                                            <option value="usa">USA/Canadá</option>
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-semibold mb-2">{t[language].goal}</label>
+                                        <select 
+                                            value={registerForm.exerciseGoal}
+                                            onChange={(e) => setRegisterForm({...registerForm, exerciseGoal: e.target.value})}
+                                            className={`w-full px-4 py-3 border rounded-lg ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'border-gray-300'}`}
+                                        >
+                                            <option value="strength">{t[language].strength}</option>
+                                            <option value="weightLoss">{t[language].weightLoss}</option>
+                                            <option value="hormonal">{t[language].hormonal}</option>
+                                        </select>
+                                    </div>
+
+                                    <button type="submit" className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-lg font-semibold hover:shadow-lg transition">
+                                        {t[language].register}
+                                    </button>
+                                </form>
+
+                                <div className="mt-6 text-center">
+                                    <button onClick={() => setAuthView('login')} className="text-purple-600 hover:underline text-sm">
+                                        {language === 'es' ? '¿Ya tienes cuenta? Inicia sesión' : 'Already have an account? Login'}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    );
+                }
+            };
+
+            // ============================================================
+            // HOME
+            // ============================================================
+            const renderHome = () => {
+                if (!currentUser) return null;
+                
+                return (
+                    <div className="pb-32 space-y-8">
+                        <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-2xl p-8 shadow-lg">
+                            <h1 className="text-4xl font-light mb-3">
+                                {language === 'es' ? `¡Bienvenida, ${currentUser.name}! 💜` : `Welcome, ${currentUser.name}! 💜`}
+                            </h1>
+                            <p className="text-lg opacity-90">
+                                {isPremium() 
+                                    ? (language === 'es' ? 'Miembro Premium ✨' : 'Premium Member ✨')
+                                    : (language === 'es' ? 'Cuenta Gratuita' : 'Free Account')
+                                }
+                            </p>
+                        </div>
+
+                        {!isPremium() && (
+                            <div className={`${darkMode ? 'bg-yellow-900' : 'bg-yellow-50'} border-l-4 border-yellow-500 p-6 rounded-lg`}>
+                                <h3 className="font-bold mb-2 text-yellow-900 dark:text-yellow-200">
+                                    {language === 'es' ? '✨ Desbloquea Todo el Potencial' : '✨ Unlock Full Potential'}
+                                </h3>
+                                <p className="text-sm mb-4 text-yellow-800 dark:text-yellow-300">
+                                    {language === 'es' 
+                                        ? 'Accede a menús personalizados, rutinas de ejercicio y más'
+                                        : 'Access personalized menus, exercise routines and more'}
+                                </p>
+                                <button onClick={handleSubscribe} className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg transition text-sm">
+                                    {t[language].upgradeNow} 🚀
+                                </button>
+                            </div>
+                        )}
+
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl p-6 shadow`}>
+                                <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-600'} mb-2`}>IMC</p>
+                                <p className="text-3xl font-bold gradient-text">{currentUser.bmi}</p>
+                            </div>
+                            <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl p-6 shadow`}>
+                                <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-600'} mb-2`}>TDEE</p>
+                                <p className="text-3xl font-bold text-pink-600">{currentUser.tdee}</p>
+                            </div>
+                            <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl p-6 shadow`}>
+                                <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-600'} mb-2`}>{language === 'es' ? 'Edad' : 'Age'}</p>
+                                <p className="text-3xl font-bold text-blue-600">{currentUser.age}</p>
+                            </div>
+                            <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl p-6 shadow`}>
+                                <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-600'} mb-2`}>Status</p>
+                                <p className="text-lg font-bold text-green-600">{isPremium() ? '💎' : '🆓'}</p>
+                            </div>
+                        </div>
+
+                        <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl p-8 shadow`}>
+                            <h2 className="text-2xl font-semibold gradient-text mb-4">
+                                {language === 'es' ? '¿Qué es Lumina?' : 'What is Lumina?'}
+                            </h2>
+                            <p className={`${darkMode ? 'text-gray-300' : 'text-gray-700'} mb-4`}>
+                                {language === 'es' 
+                                    ? 'Tu compañera personalizada para la transición de la perimenopausia. Menús adaptados, ejercicios personalizados y seguimiento científico.'
+                                    : 'Your personalized companion for the perimenopause transition. Adapted menus, personalized exercises and scientific tracking.'}
+                            </p>
+                        </div>
+                    </div>
+                );
+            };
+
+            // ============================================================
+            // CONTENT ROUTER
+            // ============================================================
+            const renderContent = () => {
+                if (!currentUser) return null;
+                
+                if (currentPage === 'home') return renderHome();
+                
+                if (['nutrition', 'exercise', 'symptoms'].includes(currentPage)) {
+                    if (!isPremium()) return <UpgradePrompt />;
+                    
+                    return (
+                        <div className="pb-32 space-y-8">
+                            <h2 className="text-3xl font-light gradient-text">
+                                {t[language][currentPage]}
+                            </h2>
+                            <p className="text-gray-600 dark:text-gray-400">
+                                {language === 'es' ? 'Contenido premium próximamente...' : 'Premium content coming soon...'}
+                            </p>
+                        </div>
+                    );
+                }
+                
+                return renderHome();
+            };
+
+            // ============================================================
+            // LOADING
+            // ============================================================
+            if (loading) {
+                return (
+                    <div className={`min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-purple-100 to-pink-100'} flex items-center justify-center`}>
+                        <div className="text-center">
+                            <h1 className="text-6xl font-light gradient-text mb-4">✨</h1>
+                            <p className="text-gray-600 dark:text-gray-400">Lumina</p>
+                        </div>
+                    </div>
+                );
+            }
+
+            // ============================================================
+            // MAIN RENDER
+            // ============================================================
+            if (!session) return renderAuth();
+
+            return (
+                <div className={darkMode ? 'bg-gray-900 text-white min-h-screen' : 'bg-gray-50 min-h-screen'}>
+                    <header className={`${darkMode ? 'bg-gray-800' : 'bg-white'} shadow sticky top-0 z-40`}>
+                        <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+                            <h1 className="text-2xl font-light gradient-text">✨ Lumina</h1>
+                            <div className="flex items-center gap-3">
+                                <button onClick={() => setLanguage(language === 'es' ? 'en' : 'es')} className="px-3 py-2 rounded text-sm bg-gray-100 dark:bg-gray-700">
+                                    {language === 'es' ? '🇪🇸' : '🇬🇧'}
+                                </button>
+                                <button onClick={() => setDarkMode(!darkMode)} className="px-3 py-2 rounded text-sm bg-gray-100 dark:bg-gray-700">
+                                    {darkMode ? '☀️' : '🌙'}
+                                </button>
+                                {!isPremium() && (
+                                    <button onClick={handleSubscribe} className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-2 rounded text-sm font-semibold hover:shadow-lg transition">
+                                        💎 {t[language].premium}
+                                    </button>
+                                )}
+                                <button onClick={handleLogout} className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
+                                    {t[language].logout}
+                                </button>
+                            </div>
+                        </div>
+                    </header>
+
+                    <main className="max-w-6xl mx-auto px-4 py-8">
+                        {renderContent()}
+                    </main>
+
+                    <nav className={`fixed bottom-0 left-0 right-0 ${darkMode ? 'bg-gray-800' : 'bg-white'} border-t shadow-lg`}>
+                        <div className="max-w-6xl mx-auto flex justify-around">
+                            {[
+                                { page: 'home', label: t[language].home, emoji: '🏠', premium: false },
+                                { page: 'nutrition', label: t[language].nutrition, emoji: '🥗', premium: true },
+                                { page: 'exercise', label: t[language].exercise, emoji: '💪', premium: true },
+                                { page: 'symptoms', label: t[language].symptoms, emoji: '📝', premium: true }
+                            ].map((item) => (
+                                <button 
+                                    key={item.page} 
+                                    onClick={() => setCurrentPage(item.page)}
+                                    className={`py-4 px-4 text-xs transition ${
+                                        currentPage === item.page
+                                            ? 'text-purple-600 border-t-2 border-purple-600'
+                                            : 'text-gray-600 dark:text-gray-400'
+                                    }`}
+                                >
+                                    <div className="flex flex-col items-center gap-1">
+                                        <span className="text-lg">{item.emoji}{item.premium && !isPremium() && '🔒'}</span>
+                                        <span className="text-xs">{item.label}</span>
+                                    </div>
+                                </button>
+                            ))}
+                        </div>
+                    </nav>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<LuminaApp />);
+    </script>
+</body>
+</html>
