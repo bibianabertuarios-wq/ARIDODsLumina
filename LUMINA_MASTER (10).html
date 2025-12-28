@@ -708,7 +708,27 @@ const handleSubscribe = async () => {
                 return (
                     <div className="pb-32 space-y-8" key={language}>
                         <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-2xl p-8 shadow-lg">
-                            <h1 className="text-4xl font-light mb-3">{language === 'es' ? `¡Bienvenida, ${currentUser.profileName}! 💜` : `Welcome, ${currentUser.profileName}! 💜`}</h1>
+                        {!isPremium() && (
+                <div className={`${darkMode ? 'bg-yellow-900' : 'bg-yellow-50'} border-l-4 border-yellow-500 p-6 rounded-lg mt-8`}>
+                    <h3 className="font-bold mb-2 text-yellow-900 dark:text-yellow-200">
+                        ✨ {language === 'es' ? 'Desbloquea Todo el Potencial' : 'Unlock Full Potential'}
+                    </h3>
+                    <p className="text-sm mb-4 text-yellow-800 dark:text-yellow-300">
+                        {language === 'es' 
+                            ? 'Menús personalizados, ejercicios adaptados, seguimiento completo y más'
+                            : 'Personalized menus, adapted exercises, complete tracking and more'}
+                    </p>
+                    <button 
+                        onClick={handleSubscribe} 
+                        className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition"
+                    >
+                        💎 {language === 'es' ? 'Suscribirse - Desde ' + PRICES.latam.price + '/mes' : 'Subscribe - From ' + PRICES.latam.price + '/mo'}
+                    </button>
+                    <p className="text-xs mt-2 text-yellow-700 dark:text-yellow-400">
+                        🎉 {language === 'es' ? 'Cupón LAUNCH40: 40% descuento primer mes' : 'Coupon LAUNCH40: 40% off first month'}
+                    </p>
+                </div>
+            )}                            <h1 className="text-4xl font-light mb-3">{language === 'es' ? `¡Bienvenida, ${currentUser.profileName}! 💜` : `Welcome, ${currentUser.profileName}! 💜`}</h1>
                             <p className="text-lg opacity-90">{language === 'es' ? 'Tu transformación es un acto de gracia. Cada día es una oportunidad para escuchar tu cuerpo, honrar sus cambios y fortalecerte. Lumina está aquí, contigo, en cada paso.' : 'Your transformation is an act of grace. Every day is an opportunity to listen to your body, honor its changes and strengthen yourself. Lumina is here, with you, every step of the way.'}</p>
                         </div>
 
