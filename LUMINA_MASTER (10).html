@@ -1336,14 +1336,14 @@ const handleSubscribe = async () => {
                         <div className="max-w-6xl mx-auto flex justify-around overflow-x-auto">
                             {[
                                 { page: 'home', label: t[language].home, emoji: '📊' },
-                                { page: 'nutrition', label: t[language].nutrition, emoji: '🥗' },
-                                { page: 'exercise', label: t[language].exercise, emoji: '💪' },
-                                { page: 'symptoms', label: t[language].symptoms, emoji: '📝' },
-                                { page: 'period', label: t[language].period, emoji: '📅' },
+                                { page: 'nutrition', label: t[language].nutrition, emoji: '🥗'premium: true },
+                                { page: 'exercise', label: t[language].exercise, emoji: '💪' premium: true },
+                                { page: 'symptoms', label: t[language].symptoms, emoji: '📝' premium: true },
+                                { page: 'period', label: t[language].period, emoji: '📅' premium: true },
                                 { page: 'myths', label: t[language].myths, emoji: '❌' },
                                 { page: 'tips', label: t[language].tips, emoji: '✨' },
-                                { page: 'workshops', label: t[language].workshops, emoji: '🎓' },
-                                { page: 'community', label: t[language].community, emoji: '💜' }
+                                { page: 'workshops', label: t[language].workshops, emoji: '🎓' premium: true },
+                                { page: 'community', label: t[language].community, emoji: '💜' premium: true }
                             ].map((item) => (
                                 <button key={item.page} onClick={() => setCurrentPage(item.page)}
                                     className={`py-4 px-3 text-xs sm:text-sm border-t-4 transition whitespace-nowrap ${
@@ -1351,8 +1351,7 @@ const handleSubscribe = async () => {
                                             ? `border-purple-600 ${darkMode ? 'bg-gray-700' : 'bg-purple-50'} text-purple-600`
                                             : `${darkMode ? 'border-gray-700 text-gray-400' : 'border-gray-200 text-gray-600'}`
                                     }`}>
-                                    <div>{item.emoji}</div>
-                                    <div className="hidden sm:block text-xs">{item.label}</div>
+                                    <div>{item.emoji}{item.premium && !isPremium() && ' 🔒'}</div>                                    <div className="hidden sm:block text-xs">{item.label}</div>
                                 </button>
                             ))}
                         </div>
