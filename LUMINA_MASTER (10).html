@@ -7,7 +7,11 @@
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Stripe -->
+    <script src="https://js.stripe.com/v3/"></script>    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -23,6 +27,24 @@
 
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
+        // ============================================================
+        // CONFIGURACIÓN BACKEND
+        // ============================================================
+        const SUPABASE_URL = 'https://pyekwpmbdnmglrjieexc.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB5ZWt3cG1iZG5tZ2xyamllZXhjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0ODM0OTgsImV4cCI6MjA4MTA1OTQ5OH0.zQl7GF3E6BhDqW3bEMixAbdDcOsW8BsFOBeAGa-5bzY';
+        const BACKEND_URL = 'https://lumera-backend-production.up.railway.app';
+        const STRIPE_PUBLISHABLE_KEY = 'pk_test_51Sejh162SZ6DF120ogS0E67ngoK4aE2C2xRW0pMJcfwWxaQq1UJ7';
+
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const stripe = window.Stripe(STRIPE_PUBLISHABLE_KEY);
+
+        const PRICES = {
+            latam: { id: 'price_1Sejoa62SZ6DF12Ox5sU1Y9v', price: '$4.99', original: '$8.32' },
+            emea: { id: 'price_1Sejso62SZ6DF12O5eSsNiGQ', price: '€4.99', original: '€8.32' },
+            usa: { id: 'price_1Sejuh62SZ6DF12OUR0k19Rd', price: '$6.99', original: '$11.65' }
+        };
+```
+
 
         const LuminaApp = () => {
             const [language, setLanguage] = useState('es');
