@@ -48,7 +48,8 @@
 
         const LuminaApp = () => {
             const [language, setLanguage] = useState('es');
-            const [darkMode, setDarkMode] = useState(false);
+            const [session, setSession] = useState(null);
+const [isLoadingAuth, setIsLoadingAuth] = useState(true);            const [darkMode, setDarkMode] = useState(false);
             const [currentUser, setCurrentUser] = useState(null);
             const [currentPage, setCurrentPage] = useState('home');
             const [showQuiz, setShowQuiz] = useState(false);
@@ -163,30 +164,109 @@
                     hormonal: 'Hormonal Balance'
                 }
             };
+// CARGAR DATOS Y AUTH
+useEffect(() => {
+    checkAuth();
+    
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+        setSession(session);
+        if (session) {
+            await loadUserFromDB(session.user.id);
+        }
+    });
 
-            // CARGAR DATOS
-            useEffect(() => {
-                const saved = localStorage.getItem('luminaUser');
-                const savedDark = localStorage.getItem('luminaDark');
-                const savedLang = localStorage.getItem('luminaLang');
-                const savedSymptoms = localStorage.getItem('luminaSymptoms');
-                const savedPeriod = localStorage.getItem('luminaPeriod');
-                const savedMessages = localStorage.getItem('luminaMessages');
-                
-                if (saved) {
-                    setCurrentUser(JSON.parse(saved));
-                    setCurrentPage('home');
-                } else {
-                    setShowQuiz(true);
-                }
-                
-                if (savedDark) setDarkMode(JSON.parse(savedDark));
-                if (savedLang) setLanguage(savedLang);
-                if (savedSymptoms) setSymptoms(JSON.parse(savedSymptoms));
-                if (savedPeriod) setPeriodLog(JSON.parse(savedPeriod));
-                if (savedMessages) setUserMessages(JSON.parse(savedMessages));
-            }, []);
+    const saved = localStorage.getItem('luminaUser');
+    const savedDark = localStorage.getItem('luminaDark');
+    const savedLang = localStorage.getItem('luminaLang');
+    const savedSymptoms = localStorage.getItem('luminaSymptoms');
+    const savedPeriod = localStorage.getItem('luminaPeriod');
+    const savedMessages = localStorage.getItem('luminaMessages');
+    
+    if (saved && !session) {
+        setCurrentUser(JSON.parse(saved));
+        setCurrentPage('home');
+    } else if (!saved && !session) {
+        setShowQuiz(true);
+    }
+    
+    if (savedDark) setDarkMode(JSON.parse(savedDark));
+    if (savedLang) setLanguage(savedLang);
+    if (savedSymptoms) setSymptoms(JSON.parse(savedSymptoms));
+    if (savedPeriod) setPeriodLog(JSON.parse(savedPeriod));
+    if (savedMessages) setUserMessages(JSON.parse(savedMessages));
 
+    return () => {
+        authListener?.subscription?.unsubscribe();
+    };
+}, []);
+
+const checkAuth = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    setSession(session);
+    if (session) {
+        await loadUserFromDB(session.user.id);
+    }
+    setIsLoadingAuth(false);
+};
+
+const loadUserFromDB = async (userId) => {
+    try {
+        const { data, error } = await supabase
+            .from('users')
+            .select('*')
+            .eq('id', userId)
+            .single();
+
+        if (error) throw error;
+        if (data) {
+            setCurrentUser(data);
+            localStorage.setItem('luminaUser', JSON.stringify(data));
+        }
+    } catch (error) {
+        console.error('Error loading user:', error);
+    }
+};
+
+const isPremium = () => {
+    return currentUser && currentUser.subscription_status === 'active';
+};
+
+const handleSubscribe = async () => {
+    if (!currentUser) {
+        alert(language === 'es' ? 'Por favor completa el cuestionario primero' : 'Please complete the questionnaire first');
+        return;
+    }
+
+    try {
+        const region = currentUser.region || 'latam';
+        const priceId = PRICES[region].id;
+
+        const response = await fetch(`${BACKEND_URL}/api/create-checkout-session`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                userId: currentUser.id,
+                email: currentUser.profileName + '@lumina.app',
+                priceId: priceId,
+                region: region,
+                applyCoupon: true
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            window.location.href = data.url;
+        } else {
+            throw new Error(data.error);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert(language === 'es' ? 'Error al procesar el pago' : 'Error processing payment');
+    }
+};            
+                
+                
             // GUARDAR DATOS
             useEffect(() => {
                 localStorage.setItem('luminaDark', JSON.stringify(darkMode));
